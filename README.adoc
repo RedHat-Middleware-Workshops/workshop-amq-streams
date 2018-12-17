@@ -1,0 +1,3 @@
+# What is this?
+
+This is a workshop for teaching the basics of AMQ Streams.
