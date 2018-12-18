@@ -1,0 +1,24 @@
+== Environment
+
+The lab environment provides a virtualized setup for developing and running Kafka applications on OpenShift.
+It consists of:
+
+* an OpenShift cluster with one master node and three worker nodes;
+* a workstation;
+
+During the lab you will interact with the OpenShift cluster via CLI from the workstation and with the OpenShift web console from the browser available on your station.
+Make note of the URLs that you will use during the lab.
+
+|===
+| Machine | URL | Access
+| Workstation | `workstation-<GUID>.rhpds.opentlc.com` | SSH (port 22)
+| Master (OpenShift console) | `openshift-<GUID>.rhpds.opentlc.com` | HTTPS (port 8443)
+|===
+
+[NOTE]
+.Remember your GUID
+At the start of the lab you have been provided with a GUID, which uniquely identifies your lab environment.
+In the following instructions, replace the `<GUID>` placeholder with your GUID.
+For example, if your GUID is `a2b3`, the URL `workstation-<GUID>.example.com` becomes `workstation-a2b3.example.com`.
+
+Now, let's start the lab.
