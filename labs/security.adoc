@@ -1,0 +1,174 @@
+== Security
+
+=== Securing listeners
+
+The first step for securing a Kafka cluster is securing its listeners.
+You can add security options to each of the configured listeners.
+For example, let us change the cluster definition:
+
+----
+cat >> production-ready-secured.yaml <<'EOF'
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: Kafka
+metadata:
+  name: production-cluster
+spec:
+  kafka:
+    replicas: 3
+    listeners:
+      plain:
+        authentication:
+          type: scram-sha-512
+      tls: {}
+    config:
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+    storage:
+      type: persistent-claim
+      size: 20Gi
+      deleteClaim: false
+  zookeeper:
+    replicas: 3
+    storage:
+      type: persistent-claim
+      size: 1Gi
+      deleteClaim: false
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+EOF
+----
+
+Let's deploy the new configuration:
+
+----
+oc apply -f production-ready-secured.yaml
+----
+
+The `plain` listener is now configured to use the `SCRAM` challenge mechanism for connecting clients.
+
+=== Creating users and ACLs
+
+Now that we have configured the broker to be secured, we need to create users so that our clients can connect.
+Users are managed through `KafkaUser` resources, which also manage the user authorization.
+Let's create our first user.
+
+----
+cat >> test-topic-reader-user.yaml <<'EOF'
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaUser
+metadata:
+  name: test-topic-reader
+  labels:
+    strimzi.io/cluster: production-ready
+spec:
+  authentication:
+    type: scram-sha-512
+  authorization:
+    type: simple
+    acls:
+      # Example consumer Acls for topic my-topic suing consumer group my-group
+      - resource:
+          type: topic
+          name: test-topic
+          patternType: literal
+        operation: Read
+        host: "*"
+      - resource:
+          type: topic
+          name: test-topic
+          patternType: literal
+        operation: Describe
+        host: "*"
+      - resource:
+          type: group
+          name: testGroup
+          patternType: literal
+        operation: Read
+        host: "*"
+EOF
+----
+
+Let's apply this new configuration.
+
+----
+oc apply -f test-topic-reader-user.yaml
+----
+
+The newly created user can read the metadata of topic `test-topic` and consume (read) from it with the consumer group `test-group`.
+
+But now we need a user that can produce data to `test-topic`!
+Let's create a new resource:
+----
+cat >> test-topic-writer-user.yaml <<'EOF'
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaUser
+metadata:
+  name: test-topic-writer
+  labels:
+    strimzi.io/cluster: production-ready
+spec:
+  authentication:
+    type: scram-sha-512
+  authorization:
+    type: simple
+    acls:
+      # Example Producer Acls for topic my-topic
+      - resource:
+          type: topic
+          name: streams-plaintext-input
+          patternType: literal
+        operation: Write
+        host: "*"
+EOF
+----
+
+And let's apply this new configuration.
+----
+oc apply -f test-topic-reader-user.yaml
+----
+
+Go to `Secrets` and observe that new secret named `test-topic-reader` and `test-topic-writer` have been created.
+This secret has a field named `password`.
+This is the password to be used by the user.
+
+Now let's redeploy our running applications.
+Looking at the logs, we see a lot of errors - the clients cannot connect anymore.
+
+We need to reconfigure the running apps:
+
+----
+camel.component.kafka.configuration.brokers=my-cluster-kafka-bootstrap.amq-streams.svc:9092
+camel.component.kafka.configuration.group-id=testGroup
+camel.component.kafka.configuration.sasl-jaas-config=org.apache.kafka.common.security.scram.ScramLoginModule required username=${KAFKA_USER} password=${KAFKA_PASSWORD};
+camel.component.kafka.configuration.sasl-mechanism=SCRAM-SHA-512
+camel.component.kafka.configuration.security-protocol=SASL_PLAINTEXT
+----
+
+Where do the values for `$KAFKA_USER` and `$KAFKA_PASSWORD` come from?
+They need to be injected into the configuration from the deployment.
+
+Let's add the two propertie to the deployment:
+
+----
+- name: KAFKA_USER
+  value: test-topic-reader
+- name: KAFKA_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      key: password
+      name: test-topic-reader
+----
+
+and 
+
+----
+- name: KAFKA_USER
+  value: test-topic-writer
+- name: KAFKA_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      key: password
+      name: test-topic-writer
+----

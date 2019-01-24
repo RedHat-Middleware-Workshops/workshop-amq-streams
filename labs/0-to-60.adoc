@@ -1,0 +1,208 @@
+== AMQ Streams on OpenShift from 0 to 60
+
+In this module you will learn how to install AMQ Streams on OpenShift.
+
+=== Installing AMQ Streams
+
+All the components are available at the [Downloads page](https://developers.redhat.com/products/amq/download/) of [https://developers.redhat.com/products/amq/overview/](https://developers.redhat.com/products/amq/overview/).
+Navigate to that page and download AMQ Streams.
+
+The downloaded file is named `install_and_examples_0.zip`.
+Extract it in your working folder and unzip it.
+Navigate inside the resulting folder.
+
+    $ cd <download_folder>/install_and_examples_0
+
+For the rest of the workshop, we will call this folder `$AMQSTREAMS_HOME`.
+
+=== Creating a new project for running the cluster operator
+
+Log in as the admin.
+
+    oc login -u admin
+
+Once you are logged in, create a new project, called `amq-streams`.
+
+    oc new-project amq-streams
+
+=== Logging in as cluster administrator
+
+One of the prerequisites of installing AMQ Streams on OpenShift is having access to a user with cluster administration permissions.
+For the rest of the lab, we will assume that the user `admin` has this permission - and it has been set up before the start of the class.
+
+    $ oc login -u admin $MASTER_NODE_URL
+
+[TIP]
+.Using the `system:admin` user
+====
+On clusters that you set up yourself (e.g. via `oc cluster up` on your local machine or Minishift) you can use the `system:admin` user.
+====
+
+=== Configuring the cluster operator and installing it
+
+The configuration files for the cluster operator are available in the `$AMQSTREAMS_HOME/install/cluster-operator` folder.
+Let's take a quick look.
+
+----
+$ cd install/cluster-operator
+$ ls
+010-ServiceAccount-strimzi-cluster-operator.yaml
+020-ClusterRole-strimzi-cluster-operator-role.yaml
+020-RoleBinding-strimzi-cluster-operator.yaml
+021-ClusterRole-strimzi-cluster-operator-role.yaml
+021-ClusterRoleBinding-strimzi-cluster-operator.yaml
+030-ClusterRole-strimzi-kafka-broker.yaml
+030-ClusterRoleBinding-strimzi-cluster-operator-kafka-broker-delegation.yaml
+031-ClusterRole-strimzi-entity-operator.yaml
+031-RoleBinding-strimzi-cluster-operator-entity-operator-delegation.yaml
+032-ClusterRole-strimzi-topic-operator.yaml
+032-RoleBinding-strimzi-cluster-operator-topic-operator-delegation.yaml
+040-Crd-kafka.yaml
+041-Crd-kafkaconnect.yaml
+042-Crd-kafkaconnects2i.yaml
+043-Crd-kafkatopic.yaml
+044-Crd-kafkauser.yaml
+045-Crd-kafkamirrormaker.yaml
+050-Deployment-strimzi-cluster-operator.yaml
+----
+
+We will not get into details about the structure of the files, but, for now, it is important to understand that, taken together, they are the complete set of resources required to set up AMQ Streams on an OpenShift cluster.
+The files include:
+
+* service account
+* cluster roles and and bindings
+* a set of CRDs (Custom Resource Definitions) for the objects managed by the AMQ Streams cluster operator
+* the cluster operator Deployment
+
+Prior to installing the cluster operator, we will need to configure the namespaces it operates with.
+We will do this by modifying the `*RoleBinding*.yaml` files to point to the newly created project `amq-streams`.
+You can do this by simply editing all files via `sed`.
+
+----
+sed -i 's/namespace: .*/namespace: amq-streams/' install/cluster-operator/*RoleBinding*.yaml
+----
+
+Let's take a look at the result in one of the modified files, e.g. `020-RoleBinding-strimzi-cluster-operator.yaml`:
+
+----
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: strimzi-cluster-operator
+  labels:
+    app: strimzi
+subjects:
+- kind: ServiceAccount
+  name: strimzi-cluster-operator
+  namespace: amq-streams
+roleRef:
+  kind: ClusterRole
+  name: strimzi-cluster-operator-namespaced
+  apiGroup: rbac.authorization.k8s.io
+----
+
+Notice the `amq-streams` value configured for `subjects[namespace]`.
+You can check the other `*RoleBinding*.yaml` files for similar changes.
+
+Now that the configuration files have been set, we can proceed with installing the cluster operator.
+
+=== Installing the cluster operator
+
+Once the configuration files are changed, you can install the cluster operator:
+
+----
+oc apply -f install/cluster-operator -n amq-streams
+----
+
+For visualizing the result, log into the OpenShift console, with the same user you employed for creating the project, e.g. `developer`.
+Navigate to the `amq-streams` project and visualize the current deployments.
+You should see the `strimzi-cluster-operator` running.
+You have just deployed the cluster operator.
+
+=== Creating an Apache Kafka cluster
+
+It is time to start an Apache Kafka cluster.
+We will create now the most basic cluster possible in a new file, `simplest-cluster.yaml`.
+
+----
+cat >> simplest-cluster.yaml <<'EOF'
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: Kafka
+metadata:
+  name: simplest-cluster
+spec:
+  kafka:
+    replicas: 1
+    listeners:
+      plain: {}
+      tls: {}
+    config:
+      offsets.topic.replication.factor: 1
+      transaction.state.log.replication.factor: 1
+      transaction.state.log.min.isr: 1
+    storage:
+      type: ephemeral
+  zookeeper:
+    replicas: 1
+    storage:
+      type: ephemeral
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+EOF
+----
+
+Now that the resource definition is created, let's go forth and create the cluster.
+
+----
+oc apply -f simplest-cluster.yaml
+----
+
+Again, follow the deployment from the OpenShift console.
+You should see three separate deployments:
+
+* `simplest-cluster-zookeeper` - a stateful set containing the Zookeeper ensemble
+* `simplest-cluster-kafka` - a stateful set containing the Kafka cluster
+* `simplest-cluster-entity-operator` - a deployment containing the entity operator for managing topics and users
+
+=== Testing the deployment
+
+Now, let's quickly test that the deployed Kafka cluster works.
+Let's log into one of the cluster pods:
+
+----
+$ oc rsh my-cluster-kafka-0
+----
+
+Next, let's start a producer:
+
+----
+$ bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test-topic
+----
+
+Once the console producer is started, enter a few values:
+
+----
+> test
+> test2
+----
+
+Now let's log into another cluster pod in a separate terminal (you will need to `ssh` into the workstation):
+
+----
+$ oc rsh my-cluster-kafka-0
+----
+
+And let's start a consumer:
+$ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning
+
+Once the consumer is started, you should see the previously sent messages in the output.
+Reverting to the terminal where we started the console producer and sending any new messages there will result in those messages being displayed in the consumer terminal.
+
+=== Conclusion
+
+In this workshop module, you have:
+
+* Configured and Installed AMQ Streams
+* Deployed a simple Kafka cluster
+* Run a producer and consumer to validate the settings

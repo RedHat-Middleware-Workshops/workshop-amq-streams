@@ -1,0 +1,74 @@
+== Connecting: within and outside OCP
+
+As you have seen, a Kafka cluster deployed in OpenShift can be used by other applications deployed in the same OpenShift instance.
+This is the primary use case.
+
+=== Accessing Kafka from within the cluster
+
+
+=== Configuring external routes
+
+In certain scenarios, a Kafka cluster deployed in OpenShift may need to be accessed from outside the cluster.
+Let's see how that can be enabled.
+
+First, we need to reconfigure the cluster with an `external` listener.
+
+----
+cat >> production-ready-external-routes.yaml <<'EOF'
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: Kafka
+metadata:
+  name: production-ready
+spec:
+  kafka:
+    replicas: 3
+    listeners:
+      plain: {}
+      tls: {}
+      external:
+        type: route
+    config:
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+    storage:
+      type: persistent-claim
+      size: 50Gi
+      deleteClaim: false
+  zookeeper:
+    replicas: 3
+    storage:
+      type: persistent-claim
+      size: 1Gi
+      deleteClaim: false
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+EOF
+----
+
+Now let's apply this configuration to the running cluster.
+
+----
+oc apply -f production-ready-external-routes.yaml
+----
+
+Now you can inspect the existing services.
+Notice that each of the brokers in the cluster has a route.
+A new service has been created for external connections.
+
+=== Connecting external clients
+
+First, we need to extract the certificate of the server.
+
+----
+oc extract secret/production-ready-cluster-ca-cert --keys=ca.crt --to=- >certificate.crt
+----
+
+Then, we need to install it into a Java keystore.
+
+----
+keytool -import -trustcacerts -alias root -file certificate.crt -keystore keystore.jks -storepass password -noprompt
+----
+
+We can now run our producer and consumer applications by using this certificate.

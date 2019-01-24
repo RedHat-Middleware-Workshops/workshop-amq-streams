@@ -1,5 +1,12 @@
 == Environment
 
+You can run the labs either on RHPDS or on Minishift.
+Here's some important information before you start.
+
+=== Minishift
+
+=== RHPDS
+
 The lab environment provides a virtualized setup for developing and running Kafka applications on OpenShift.
 It consists of:
 

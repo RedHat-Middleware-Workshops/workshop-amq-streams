@@ -10,14 +10,14 @@ This is the lab section of the AMQ Streams workshop.
 
 . link:./production-ready-topologies.adoc[Production-ready topologies: sizing and persistence]
 
-. Topic management
+. link:./topic-management.adoc[Topic management]
 
-. Clients: within OCP and outside OCP
+. link:./clients-within-outside-OCP.adoc[Clients: within OCP and outside OCP]
 
-. Management, monitoring and troubleshooting
+. link:./management-monitoring.adoc[Management, monitoring and troubleshooting]
 
-. Security:
+. link:./security.adoc[Security]
 
-. Running KafkaConnect applications
+. link:./kafka-connect.adoc[Running KafkaConnect applications]
 
-. Replicating Data with MirrorMaker
+. link:./mirror-maker.adoc[Replicating Data with MirrorMaker]

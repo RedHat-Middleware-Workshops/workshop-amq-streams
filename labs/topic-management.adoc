@@ -1,0 +1,105 @@
+== Topic Management
+
+In the next module we will focus on creating and managing topics.
+In AMQ Streams, topics are managed through a KafkaTopic resource.
+
+=== Creating a topics
+
+Let's create a topic.
+First, we will create a YAML file.
+Execute the following command to the command line.
+
+----
+cat >> test-topic-initial.yaml <<'EOF'
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaTopic
+metadata:
+  name: test-topic
+  labels:
+    strimzi.io/cluster: production-ready
+spec:
+  partitions: 2
+  replicas: 2
+  config:
+    retention.ms: 7200000
+    segment.bytes: 1073741824
+EOF
+----
+
+Notice a few important attributes:
+
+* `metadata.name` which is the name of the topic
+* `metadata.labels[strimzi.io/cluster]` which is the target cluster for the topic (remember that you could have more) than one cluster in the same namespace;
+* `spec.partitions` which is the partition count of the topic
+* `spec.replicas` which is the number of replicas per partition
+* `spec.config` which contains miscellaneous configuration options, such as retention time and segment size
+
+Now let's deploy the `KafkaTopic` into our current project:
+
+----
+oc apply -f examples/topic/test-topic-initial.yaml
+----
+
+Let's wait a number of seconds and let's try to check that the topic has been created and log into one of the Kafka pods.
+
+----
+oc rsh production-ready-kafka-0
+----
+
+Let's get the topic information.
+
+----
+sh-4.2$ bin/kafka-topics.sh --zookeeper localhost:2181 --topic test-topic --describe
+----
+
+The expected result should look like:
+
+----
+OpenJDK 64-Bit Server VM warning: If the number of processors is expected to increase from one, then you should configure the number of parallel GC threads appropriately using -XX:ParallelGCThreads=N
+Topic:test-topic	PartitionCount:2	ReplicationFactor:2	Configs:segment.bytes=1073741824,retention.ms=7200000
+	Topic: test-topic	Partition: 0	Leader: 4	Replicas: 4,3	Isr: 4,3
+	Topic: test-topic	Partition: 1	Leader: 0	Replicas: 0,4	Isr: 0,4
+----
+
+Now let's increase the number of partitions.
+First, we create a new resource.
+
+----
+cat >> test-topic-10-partitions.yaml <<'EOF'
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaTopic
+metadata:
+  name: test-topic
+  labels:
+    strimzi.io/cluster: production-ready
+spec:
+  partitions: 10
+  replicas: 2
+  config:
+    retention.ms: 7200000
+    segment.bytes: 1073741824
+EOF
+----
+
+Next, we will apply the new configuration.
+----
+oc apply -f examples/topic/test-topic-10-partitions.yaml
+----
+
+And let's get the topic information again.
+The topic has now 10 partitions.
+
+----
+sh-4.2$ bin/kafka-topics.sh --zookeeper localhost:2181 --topic test-topic --describe
+OpenJDK 64-Bit Server VM warning: If the number of processors is expected to increase from one, then you should configure the number of parallel GC threads appropriately using -XX:ParallelGCThreads=N
+Topic:test-topic	PartitionCount:10	ReplicationFactor:2	Configs:segment.bytes=1073741824,retention.ms=7200000
+	Topic: test-topic	Partition: 0	Leader: 4	Replicas: 4,3	Isr: 4,3
+	Topic: test-topic	Partition: 1	Leader: 0	Replicas: 0,4	Isr: 0,4
+	Topic: test-topic	Partition: 2	Leader: 1	Replicas: 1,2	Isr: 1,2
+	Topic: test-topic	Partition: 3	Leader: 2	Replicas: 2,3	Isr: 2,3
+	Topic: test-topic	Partition: 4	Leader: 3	Replicas: 3,4	Isr: 3,4
+	Topic: test-topic	Partition: 5	Leader: 4	Replicas: 4,1	Isr: 4,1
+	Topic: test-topic	Partition: 6	Leader: 0	Replicas: 0,2	Isr: 0,2
+	Topic: test-topic	Partition: 7	Leader: 1	Replicas: 1,3	Isr: 1,3
+	Topic: test-topic	Partition: 8	Leader: 2	Replicas: 2,4	Isr: 2,4
+	Topic: test-topic	Partition: 9	Leader: 3	Replicas: 3,0	Isr: 3,0

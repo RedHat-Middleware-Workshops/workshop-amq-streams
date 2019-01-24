@@ -1,0 +1,66 @@
+This lab walks through setting up mirrormaker and testing the setup to ensure that messages sent to one cluster are being replicated/mirrored in the mirrormaker target cluster.
+
+We will use the first cluster previously created in this workshop as the "source" cluster.
+We will create the mirror-maker "target" cluster.
+
+
+Prerequisites: +
+1. You have 'my-cluster-kafka' installed per previous labs +
+2. You have 'my-topic' created per previous labs +
+3. Make sure you are logged in to Openshift with the oc client +
+
+
+Steps +
+
+
+    Step 1: Run this to create the "target" cluster. This will be the cluster that mirror maker writes to.
+
+    oc apply -f https://raw.githubusercontent.com/kasriniv/workshop-amq-streams/master/labs/lab07-mirrormaker/kafka-ephemeral-mtarget.yaml
+
+    Make sure the pods have come up fine.
+
+    Step 2: create the mirror maker configuration
+
+    oc apply -f https://raw.githubusercontent.com/kasriniv/workshop-amq-streams/master/labs/lab07-mirrormaker/kafka-mirror-maker-lab.yaml
+
+    Make sure the pods have come up fine.
+
+
+Testing via command line +
+
+ NOTE : The producer and consumer are from the mirror maker's perspective. Messages will be read from the producer (in mirrormaker config) and published to consumer. +
+
+
+   Go to the Openshift webconsole->Applications->Pods and pick the my-cluster-mtarget-kafka-0 ->Terminal and run +
+   ./bin/kafka-topics.sh --list --zookeeper localhost:2181 +
+   This will confirm that my-topic was created automatically. +
+
+
+   Send some messages to my-topic on my-kafka-cluster +
+  ./bin/kafka-console-producer.sh --broker-list my-cluster-kafka-bootstrap:9092 --topic my-topic +
+
+
+   See these messages being replicated to my-topic on my-cluster-mtarget-kafka +
+   ./bin/kafka-console-consumer.sh --bootstrap-server my-cluster-mtarget-kafka-bootstrap:9092   --topic my-topic --from-beginning
+
+
+
+Testing via supplied generic producer and consumer SpringBoot  +
+
+   Deploy the app : generic producer to the Openshift cluster
+   git clone
+   cd <......>/testapp/generic-producer
+   mvn -DskipTests fabric8:deploy
+
+   To send messages to my-topic (Edit below curl for your Openshift route)
+   curl -X POST http://generic-myproject.apps.kasriniv-b22e.openshiftworkshop.com/camel/posttotopic -d 'hello' -H 'Content-Type: text'
+
+
+  Deploy the app: generic consumer to the Openshift cluster
+
+  cd <......>/testapp/generic-consumer
+  mvn -DskipTests fabric8:deploy
+
+  Edit the consumer.html line 29 to point to the Openshift route for the consumer service.
+  Now use your local browser to render consumer.html and hit 'Submit Request'
+  You should see an HMTL page with a table of all messages. 

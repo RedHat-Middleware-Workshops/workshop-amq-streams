@@ -1,0 +1,188 @@
+== Production-ready topologies: sizing and persistence
+
+In the previous module, we have set up a simple Apache Kafka cluster.
+It is suitable for development and experimentation, but not for a production setting.
+In this module you will learn how to use AMQ Streams for configuring a Kafka cluster for production usage, in particular sizing and persistence settings.
+
+=== Some words on size and persistence
+
+Configuring your Kafka cluster depends on a number of factors, and in particular of your development and production requirements for throughput and scalability, but there are a few principles to observe:
+
+* Making sure that you deploy at least 3 Kafka brokers for scaling and HA
+* Making sure that topics are replicated on at least two nodes
+* Making sure that your Zookeeper ensemble has at least 3 nodes
+* Making sure that the data of your Kafka cluster is persistent
+
+Our ephemeral cluster created in the previous module meets some but not all of these criteria: it has the minimum number of nodes for both Kafka and Zookeeper, but it not persistent.
+Plus, we really had no control over sizing - we just used a default!
+
+=== Configuring the size of your Kafka cluster deployments
+
+AMQ Streams treats an Apache Kafka cluster deployment as a custom resource and controls the configuration of an Apache Kafka cluster through a Custom Resource Definition (CRD).
+Let's take a quick look at the resource descriptor for the cluster we just deployed:
+
+----
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: Kafka
+metadata:
+  name: simplest-cluster
+spec:
+  kafka:
+    replicas: 1
+    listeners:
+      plain: {}
+      tls: {}
+    config:
+      offsets.topic.replication.factor: 1
+      transaction.state.log.replication.factor: 1
+      transaction.state.log.min.isr: 1
+    storage:
+      type: ephemeral
+  zookeeper:
+    replicas: 1
+    storage:
+      type: ephemeral
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+----
+
+Let's take a look at a few of the cluster properties.
+The cluster has:
+
+* a name: `metadata.name: my-cluster`
+* a number of kafka replicas: `spec.kafka.replicas: 1`
+* storage configuration for the Kafka cluster: `spec.kafka.storage: ephemeral`
+* configurations for listeners and configuration parameters for the brokers (e.g. replication settings)
+* a number of zookeeper replicas: `spec.zookeeper.replicas: 1`
+* storage configuration for the ZooKeeper cluster: `spec.zookeeper.storage: ephemeral`
+
+=== Configuring a cluster of a given size and persistence
+
+While a single-broker ephemeral cluster is good enough for development and experimentation, it is definitely not a good option for production and staging workloads.
+A healthy cluster must have more than one broker for HA and throughput, and must persist its data on a persistent filesystem.
+
+First let's check if the previously deployed cluster is still there.
+
+----
+oc get kafka
+----
+
+You might get an empty result, but in case you don't, just remove the existing cluster.
+
+----
+oc delete kafka simple-cluster
+----
+
+Now let's create a new resource.
+
+----
+cat >> production-ready.yaml <<'EOF'
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: Kafka
+metadata:
+  name: production-ready
+spec:
+  kafka:
+    replicas: 3
+    listeners:
+      plain: {}
+      tls: {}
+    config:
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+    storage:
+      type: persistent-claim
+      size: 20Gi
+      deleteClaim: false
+  zookeeper:
+    replicas: 3
+    storage:
+      type: persistent-claim
+      size: 1Gi
+      deleteClaim: false
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+EOF
+----
+
+Let's deploy this new resource.
+
+----
+oc apply -f production-ready.yaml
+----
+
+The cluster `production-ready` has the minimal settings for a highly available, persistent cluster.
+
+* 3 Kafka broker nodes - this is the minimum recommended number for a production deployment
+* 3 ZooKeeper nodes - this is the minimum recommended number for a production deployments
+* `persistent-claim` storage that ensures that persistent volumes are allocated to Kafka and ZooKeeper instances
+
+Note that while the minimum number is 3 for both, the number of Kafka brokers is likely to be different from the number of ZooKeeper nodes.
+The latter may be less than the number of Kafka brokers.
+Other settings control the replication factors for offsets and transaction logs.
+A minimum of two is recommended. 
+
+==== Scaling up the cluster
+
+Let us scale up the cluster.
+
+----
+cat >> production-ready-5-nodes.yaml <<'EOF'
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: Kafka
+metadata:
+  name: production-ready
+spec:
+  kafka:
+    replicas: 5
+    listeners:
+      plain: {}
+      tls: {}
+    config:
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+    storage:
+      type: persistent-claim
+      size: 20Gi
+      deleteClaim: false
+  zookeeper:
+    replicas: 3
+    storage:
+      type: persistent-claim
+      size: 1Gi
+      deleteClaim: false
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+EOF
+----
+
+Notice the only change being the number of nodes.
+Let's apply this new configuration:
+
+----
+oc apply -f production-ready-5-nodes.yaml
+----
+
+Notice the number of pods of the Kafka cluster increasing to 5 and the corresponding persistent claims.
+Now let's scale down the cluster again.
+
+----
+oc apply -f production-ready.yaml
+----
+
+Notice the number of pods of the Kafka cluster decreasing back to 3.
+The persistent claims for nodes 3 and 4 are still active.
+What does this mean?
+Let's scale up the cluster again.
+
+----
+oc apply -f production-ready-5-nodes.yaml
+----
+
+Notice the number of pods increasing back to 5 and the corresponding claims being reallocated to the existing nodes.
+This means that the newly started instances will resume from where the previous instances 3 and 4 left off.
