@@ -1,3 +1,5 @@
+== MirrorMaker
+
 This lab walks through setting up mirrormaker and testing the setup to ensure that messages sent to one cluster are being replicated/mirrored in the mirrormaker target cluster.
 
 We will use the first cluster previously created in this workshop as the "source" cluster.
@@ -63,4 +65,4 @@ Testing via supplied generic producer and consumer SpringBoot  +
 
   Edit the consumer.html line 29 to point to the Openshift route for the consumer service.
   Now use your local browser to render consumer.html and hit 'Submit Request'
-  You should see an HMTL page with a table of all messages. 
+  You should see an HMTL page with a table of all messages.

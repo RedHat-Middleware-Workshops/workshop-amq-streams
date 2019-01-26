@@ -1,0 +1,3 @@
+=== Kafka Connect
+
+We will start by deploying a KafkaConnect cluster.
