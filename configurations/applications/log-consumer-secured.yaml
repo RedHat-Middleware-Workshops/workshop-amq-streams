@@ -21,7 +21,7 @@ spec:
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_GROUP_ID
               value: secure-group
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_SASL_JAAS_CONFIG
-              value: org.apache.kafka.common.security.scram.ScramLoginModule required username=${KAFKA_USER} password=${KAFKA_PASSWORD}
+              value: org.apache.kafka.common.security.scram.ScramLoginModule required username=${KAFKA_USER} password=${KAFKA_PASSWORD};
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_SASL_MECHANISM
               value: SCRAM-SHA-512
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_SECURITY_PROTOCOL
