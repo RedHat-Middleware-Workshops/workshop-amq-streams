@@ -25,9 +25,9 @@ spec:
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_SECURITY_PROTOCOL
               value: SASL_PLAINTEXT
             - name: KAFKA_USER
-              value: secure-topic-reader
+              value: secure-topic-writer
             - name: KAFKA_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: secure-topic-reader
+                  name: secure-topic-writer
