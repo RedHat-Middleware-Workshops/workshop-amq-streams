@@ -1,0 +1,19 @@
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaUser
+metadata:
+  name: secure-topic-writer
+  labels:
+    strimzi.io/cluster: production-ready
+spec:
+  authentication:
+    type: scram-sha-512
+  authorization:
+    type: simple
+    acls:
+      # Example Producer Acls for topic secure-topic
+      - resource:
+          type: topic
+          name: secure-topic
+          patternType: literal
+        operation: Write
+        host: "*"
