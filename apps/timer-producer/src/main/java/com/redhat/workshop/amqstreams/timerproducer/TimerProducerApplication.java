@@ -1,11 +1,10 @@
 package com.redhat.workshop.amqstreams.timerproducer;
 
+import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-
-import java.util.Date;
 
 @SpringBootApplication
 public class TimerProducerApplication {
@@ -18,7 +17,7 @@ public class TimerProducerApplication {
 
 
                 from("timer:hello?period={{timer.period}}")
-                        .transform().simple(new Date().toString())
+                        .transform(header(Exchange.TIMER_FIRED_TIME).convertToString())
                         .inOnly("kafka:{{output.topic}}");
 
 
