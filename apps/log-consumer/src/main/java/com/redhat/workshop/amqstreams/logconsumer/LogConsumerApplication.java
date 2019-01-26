@@ -1,4 +1,4 @@
-package com.redhat.workshop.amqstreams.restconsumer;
+package com.redhat.workshop.amqstreams.logconsumer;
 
 import org.apache.camel.Message;
 import org.apache.camel.builder.RouteBuilder;
@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @SpringBootApplication
-public class RestConsumerApplication {
+public class LogConsumerApplication {
 
 
     private List<String> lines = new CopyOnWriteArrayList<>();
 
 
     public static void main(String[] args) {
-        SpringApplication.run(RestConsumerApplication.class, args);
+        SpringApplication.run(LogConsumerApplication.class, args);
     }
 
     @Bean
@@ -32,8 +32,8 @@ public class RestConsumerApplication {
                         .bindingMode(RestBindingMode.auto);
 
 
-                from("kafka:{{input_topic}}&&seekTo={{application.seekTo}}")
-                        .log("${in.body}")
+                from("kafka:{{input.topic}}")
+                        .log("Received from '${in.headers[kafka.TOPIC]}': ${in.body}")
                         .process(exchange -> {
                             Message in = exchange.getIn();
                             lines.add(in.getBody(String.class));
