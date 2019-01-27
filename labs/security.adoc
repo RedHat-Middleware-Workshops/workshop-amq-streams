@@ -1,4 +1,4 @@
-== Security
+== Security for clusters and topics
 
 === Securing listeners
 
@@ -11,7 +11,7 @@ cat >> production-ready-secured.yaml <<'EOF'
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: Kafka
 metadata:
-  name: production-cluster
+  name: production-ready
 spec:
   kafka:
     replicas: 3
@@ -55,11 +55,11 @@ Users are managed through `KafkaUser` resources, which also manage the user auth
 Let's create our first user.
 
 ----
-cat >> test-topic-reader-user.yaml <<'EOF'
+cat >> secured-topic-reader.yaml <<'EOF'
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: KafkaUser
 metadata:
-  name: test-topic-reader
+  name: secure-topic-reader
   labels:
     strimzi.io/cluster: production-ready
 spec:
@@ -68,22 +68,22 @@ spec:
   authorization:
     type: simple
     acls:
-      # Example consumer Acls for topic my-topic suing consumer group my-group
+      # Example consumer Acls for topic secureTopic using consumer group
       - resource:
           type: topic
-          name: test-topic
+          name: secure-topic
           patternType: literal
         operation: Read
         host: "*"
       - resource:
           type: topic
-          name: test-topic
+          name: secure-topic
           patternType: literal
         operation: Describe
         host: "*"
       - resource:
           type: group
-          name: testGroup
+          name: secure-group
           patternType: literal
         operation: Read
         host: "*"
@@ -101,7 +101,7 @@ The newly created user can read the metadata of topic `test-topic` and consume (
 But now we need a user that can produce data to `test-topic`!
 Let's create a new resource:
 ----
-cat >> test-topic-writer-user.yaml <<'EOF'
+cat >> secure-topic-writer.yaml <<'EOF'
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: KafkaUser
 metadata:
@@ -138,10 +138,80 @@ Looking at the logs, we see a lot of errors - the clients cannot connect anymore
 
 We need to reconfigure the running apps:
 
+
+----
+cat >> timer-producer-app.yaml <<'EOF'
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: timer-producer
+  labels:
+    app: kafka-workshop
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-workshop
+        name: timer-producer
+    spec:
+      containers:
+        - name: timer-producer
+          image: docker.io/mbogoevici/timer-producer:latest
+          env:
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_BROKERS
+              value: "production-ready-kafka-bootstrap.amq-streams.svc:9092"
+EOF
+----
+
+----
+oc apply -f timer-producer-app.yaml
+----
+
+----
+cat >> log-consumer-app.yaml <<'EOF'
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: log-consumer
+  labels:
+    app: kafka-workshop
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-workshop
+        name: log-consumer
+    spec:
+      containers:
+        - name: log-consumer
+          image: docker.io/mbogoevici/log-consumer:latest
+          env:
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_BROKERS
+              value: "production-ready-kafka-bootstrap.amq-streams.svc:9092"
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_GROUP_ID
+              value: testGroup
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_SASL_JAAS_CONFIG
+              value: org.apache.kafka.common.security.scram.ScramLoginModule required username=${KAFKA_USER} password=${KAFKA_PASSWORD}
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_SASL_MECHANISM
+              value: SCRAM-SHA-512
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_SECURITY_PROTOCOL
+              value: SASL_PLAINTEXT
+            - name: KAFKA_USER
+              value: test-topic-reader
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: test-topic-reader
+----
+
+
 ----
 camel.component.kafka.configuration.brokers=my-cluster-kafka-bootstrap.amq-streams.svc:9092
 camel.component.kafka.configuration.group-id=testGroup
-camel.component.kafka.configuration.sasl-jaas-config=org.apache.kafka.common.security.scram.ScramLoginModule required username=${KAFKA_USER} password=${KAFKA_PASSWORD};
+camel.component.kafka.configuration.sasl-jaas-config=;
 camel.component.kafka.configuration.sasl-mechanism=SCRAM-SHA-512
 camel.component.kafka.configuration.security-protocol=SASL_PLAINTEXT
 ----
@@ -161,7 +231,7 @@ Let's add the two propertie to the deployment:
       name: test-topic-reader
 ----
 
-and 
+and
 
 ----
 - name: KAFKA_USER

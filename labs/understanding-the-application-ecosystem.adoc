@@ -1,1 +1,110 @@
+== Understanding the application ecosystem
 
+For illustrating the different features of AMQ Streams, we will use a consumer application and a producer application based on the Kafka consumer and producer API.
+The source code of the applications is available in GitHub.
+In this example we use containerized versions of the applications and we will monitor the impact.
+
+Let's connect the applications to the production cluster we just created.
+
+First, we deploy the producer that will periodically emit messages on a topic named `lines`.
+Note the `CAMEL_COMPONENT_KAFKA_CONFIGURATION_BROKERS` environment variable that sets the bootstrap broker(s) for the application.
+The descriptor for the application is below.
+
+----
+cat >> timer-producer-app.yaml <<'EOF'
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: timer-producer
+  labels:
+    app: kafka-workshop
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-workshop
+        name: timer-producer
+    spec:
+      containers:
+        - name: timer-producer
+          image: docker.io/mbogoevici/timer-producer:latest
+          env:
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_BROKERS
+              value: "production-ready-kafka-bootstrap.amq-streams.svc:9092"
+EOF
+----
+
+Next, we deploy the application.
+
+----
+oc apply -f timer-producer-app.yaml
+----
+
+Now, let's deploy the message consumer.
+
+----
+cat >> log-consumer-app.yaml <<'EOF'
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: log-consumer
+  labels:
+    app: kafka-workshop
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-workshop
+        name: log-consumer
+    spec:
+      containers:
+        - name: log-consumer
+          image: docker.io/mbogoevici/log-consumer:latest
+          env:
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_BROKERS
+              value: "production-ready-kafka-bootstrap.amq-streams.svc:9092"
+----
+
+----
+oc apply -f log-consumer-app.yaml
+----
+
+Let's make sure that everything works.
+First, let's find the pod address.
+
+----
+oc get pods | grep log-consumer
+----
+
+The result should be something along the lines of:
+
+----
+log-consumer-5d4586bdcd-slrdk                       0/1       ContainerCreating   0          28s
+----
+
+Now let's tail the logs from the consumer (use the pod id retrieved in the previous step).
+
+----
+oc logs -f pod/log-consumer-<pod-id>  -c log-consumer --tail=-1
+----
+
+We expect the output to look like as follows:
+
+----
+2019-01-27 07:57:26.219  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:26 UTC 2019
+2019-01-27 07:57:31.165  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:31 UTC 2019
+2019-01-27 07:57:36.159  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:36 UTC 2019
+2019-01-27 07:57:41.158  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:41 UTC 2019
+2019-01-27 07:57:46.166  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:46 UTC 2019
+2019-01-27 07:57:51.158  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:51 UTC 2019
+2019-01-27 07:57:56.159  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:56 UTC 2019
+2019-01-27 07:58:01.163  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:58:01 UTC 2019
+2019-01-27 07:58:06.157  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:58:06 UTC 2019
+2019-01-27 07:58:11.160  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:58:11 UTC 2019
+2019-01-27 07:58:16.159  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:58:16 UTC 2019
+2019-01-27 07:58:21.160  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:58:21 UTC 2019
+----
+
+This indicates that the two applications communicate with each other. 

@@ -1,68 +1,62 @@
 == MirrorMaker
 
-This lab walks through setting up mirrormaker and testing the setup to ensure that messages sent to one cluster are being replicated/mirrored in the mirrormaker target cluster.
+This lab walks through setting up MirrorMaker for replicating messages between different clusters.
 
-We will use the first cluster previously created in this workshop as the "source" cluster.
-We will create the mirror-maker "target" cluster.
+=== What does MirrorMaker do?
 
+Often, applications need to communicate between each other across Kafka clusters.
+For example, data might be ingested in Kafka in a data center and consumed in another data center, for reasons such as locality.
+In this lab we will show how data can be replicated between Kafka clusters using MirrorMaker.
 
-Prerequisites: +
-1. You have 'my-cluster-kafka' installed per previous labs +
-2. You have 'my-topic' created per previous labs +
-3. Make sure you are logged in to Openshift with the oc client +
+First, we will change the `log-consumer` app.
 
+----
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/timer-producer-team-1.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer-team-2.yaml
+----
 
-Steps +
+Now the `log-consumer` application consumes data from cluster `test-2`, while `timer-producer` sends data to cluster `test-1`.
+If we log its output, we will see that no data is received.
 
+We can confirm that pointing the application to the cluster `test-1` will yield data.
+----
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer-team-1.yaml
+----
 
-    Step 1: Run this to create the "target" cluster. This will be the cluster that mirror maker writes to.
+=== Setting up the source and target clusters
 
-    oc apply -f https://raw.githubusercontent.com/kasriniv/workshop-amq-streams/master/labs/lab07-mirrormaker/kafka-ephemeral-mtarget.yaml
+We will use the clusters previously created in this workshop in the `test-1` and `test-2` namespaces as source and target clusters.
 
-    Make sure the pods have come up fine.
+----
+oc login -u admin
+oc project amq-streams
+----
 
-    Step 2: create the mirror maker configuration
+Now let's deploy MirrorMaker.
 
-    oc apply -f https://raw.githubusercontent.com/kasriniv/workshop-amq-streams/master/labs/lab07-mirrormaker/kafka-mirror-maker-lab.yaml
+----
+oc apply -f https://raw.githubusercontent.com/kasriniv/workshop-amq-streams/master/labs/lab07-mirrormaker/kafka-mirror-maker-lab.yaml
+----
 
-    Make sure the pods have come up fine.
-
-
-Testing via command line +
-
- NOTE : The producer and consumer are from the mirror maker's perspective. Messages will be read from the producer (in mirrormaker config) and published to consumer. +
-
-
-   Go to the Openshift webconsole->Applications->Pods and pick the my-cluster-mtarget-kafka-0 ->Terminal and run +
-   ./bin/kafka-topics.sh --list --zookeeper localhost:2181 +
-   This will confirm that my-topic was created automatically. +
-
-
-   Send some messages to my-topic on my-kafka-cluster +
-  ./bin/kafka-console-producer.sh --broker-list my-cluster-kafka-bootstrap:9092 --topic my-topic +
-
-
-   See these messages being replicated to my-topic on my-cluster-mtarget-kafka +
-   ./bin/kafka-console-consumer.sh --bootstrap-server my-cluster-mtarget-kafka-bootstrap:9092   --topic my-topic --from-beginning
+The notions of producer and consumer are from MirrorMaker's perspective.
+Messages will be read from the producer (in MirrorMaker config) and published to consumer.
 
 
+Go to the Openshift web console.
+Select the `test-2` project.
+Navigate to *Applications*->*Pods* and pick production-ready-kafka-0.
+Run the following command.
 
-Testing via supplied generic producer and consumer SpringBoot  +
+----
+./bin/kafka-topics.sh --list --zookeeper localhost:2181
+----
 
-   Deploy the app : generic producer to the Openshift cluster
-   git clone
-   cd <......>/testapp/generic-producer
-   mvn -DskipTests fabric8:deploy
+This will confirm that the replicated topic `lines` was created automatically.
 
-   To send messages to my-topic (Edit below curl for your Openshift route)
-   curl -X POST http://generic-myproject.apps.kasriniv-b22e.openshiftworkshop.com/camel/posttotopic -d 'hello' -H 'Content-Type: text'
+Now let's deploy `log-consumer` against the cluster in `test-2`:
 
+----
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer-team-2.yaml
+----
 
-  Deploy the app: generic consumer to the Openshift cluster
-
-  cd <......>/testapp/generic-consumer
-  mvn -DskipTests fabric8:deploy
-
-  Edit the consumer.html line 29 to point to the Openshift route for the consumer service.
-  Now use your local browser to render consumer.html and hit 'Submit Request'
-  You should see an HMTL page with a table of all messages.
+Logging the pod again should yield the expected results and data flows between systems.

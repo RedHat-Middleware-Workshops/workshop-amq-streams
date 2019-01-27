@@ -1,68 +1,83 @@
 == Management and monitoring
 
-This lab will be focus on the following: +
-- Steps to create a cluster with metrics instrumented +
-- Steps to create an instance of Prometheus and Grafana +
-- Steps to import prebuilt Grafana dashboard definitions for  kafka and zookeeper +
+This lab will be focus on:
+- Instrumenting a cluster to support metrics
+- Deploying Prometheus and Grafana
+- Importing prebuilt Grafana dashboard definitions for kafka and zookeeper.
 
 
-The Grafana and Promethus instances that come with Openshift cannot be used for application monitoring.
-And so, for this exercise, we will install our own instance of Prometheus and Grafana for kafka monitoring in the same namespace as the kafka cluster. In my case it is 'myproject'.
+While OpenShift uses Grafana and Prometheus internally, we need to use separate Prometheus and Grafana instances for our applications.
 
-Step 1: Create a new kafka cluster with metrics instrumented  +
-We create a new cluster with the  metrics instrumentation for to the new cluster : my-cluster3
-We could have edited any existing cluster but chose to create a new one.
+For this exercise, we will install our own instance of Prometheus and Grafana for kafka monitoring in the same namespace as the kafka cluster. In my case it is 'myproject'.
 
-  oc apply -f https://raw.githubusercontent.com/kasriniv/workshop-amq-streams/master/labs/lab08-Monitoring/kafka-cluster3-metrics.yaml
+=== Instrumenting the Kafka cluster
 
+We add coniguration the metrics instrumentation for the `production-ready` cluster.
 
-Step 2: Install Prometheus  +
+----
+oc apply -f https://raw.githubusercontent.com/kasriniv/workshop-amq-streams/master/labs/lab08-Monitoring/kafka-cluster3-metrics.yaml
+----
+
+=== Installing Prometheus
+
 To install Prometheus, we use instructions that are here: https://strimzi.io/docs/0.9.0/#kafka_metrics_configuration
 
-  oc login -u system:admin
+----
+oc apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.9.0/metrics/examples/prometheus/kubernetes.yaml
+----
 
-  oc apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.9.0/metrics/examples/prometheus/kubernetes.yaml
+Then we create a route for the Prometheus service.
+Make sure your project is set to 'amq-streams'.
 
+----
+oc expose svc prometheus
+----
 
-Step 3: Create a route for the Prometheus service  +
-Make sure your project is set to 'myproject' or whatever you are using throughout the labs.
-  oc expose svc prometheus
+=== Install Grafana
 
+----
+oc apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.9.0/metrics/examples/grafana/kubernetes.yaml
+----
 
+Then we create a route for the Grafana service.
+Make sure your project is set to 'amq-streams'.
 
-Step 4: Install Grafana  +
-  oc apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.9.0/metrics/examples/grafana/kubernetes.yaml
+----
+oc expose svc grafana
+----
 
+Now, let's configure the Grafana dashboard.
+Get the route:
 
+----
+oc get routes
+----
 
-Step 5: Create a route for the Grafana service  +
-Make sure your project is set to 'myproject' or whatever you are using throughout the labs.
-  oc expose svc grafana
+It should be similar to : grafana-myproject.apps-<GUID>.rhpds.com
 
-Step 6: Access the Grafana dashboard   +
-  Get the route from
-  oc get routes
-  It should be similar to : grafana-myproject.apps.<your id>.openshiftworkshop.com
-  Login as admin/admin to the Grafana dashboard on your browser with the URL from above . You can also change password to admin.
+Login as `admin`/`admin` to the Grafana dashboard on your browser with the URL from above.
+You can also change the admin password if you'd like.
 
-Step 7: Create the prometheus datasource  +
-  Go to the 'Gear' icon on the left and then pick Datasources
-  Fill following values:
+=== Setting up Grafana to monitor Kafka
+
+Create the prometheus datasource.
+Go to the `Gear' icon on the left and then pick *Datasources*.
+
+Fill following values:
   name: prometheus
   type: prometheus
-  url: (from the prometheus route like) http://prometheus-myproject.apps.<YOUR ID>.openshiftworkshop.com
-  Save and Test. You should see a 'data source tested' message.
+  url:  `http://prometheus-myproject.apps.<YOUR ID>.rhpds.com`
 
-Step 8: Importing Dashboard definitions  +
-  Go to the + on the top left and choose "import".
-  Copy the JSON from this location
-  https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.9.0/metrics/examples/grafana/strimzi-kafka.json
-  Pick prometheus as the datasource and finish
-  You should see the dashboard with data like in the screenshots.
+Save and Test. You should see a 'data source tested' message.
 
-  Similarly to create kafka-zookeeper dashboards, import the corresponding definition
-  Go to the + on the top left and choose "import".
-  Copy the JSON from this location
-  https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.9.0/metrics/examples/grafana/strimzi-zookeeper.json
-  Pick prometheus as the datasource and finish.
-  You should see the dashboard with data like in the screenshots.
+Import Dashboard definitions.
+Go to the + on the top left and choose "import".
+Copy the JSON from this location `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.9.0/metrics/examples/grafana/strimzi-kafka.json`
+Pick prometheus as the datasource and finish
+You should see the dashboard with data like in the screenshots.
+
+Similarly to create kafka-zookeeper dashboards, import the corresponding definition.
+Go to the + on the top left and choose "import".
+Copy the JSON from this location `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.9.0/metrics/examples/grafana/strimzi-zookeeper.json`
+Pick prometheus as the datasource and finish.
+You should see the dashboard with data like in the screenshots.

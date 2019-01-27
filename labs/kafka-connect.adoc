@@ -1,3 +1,92 @@
 === Kafka Connect
 
 We will start by deploying a KafkaConnect cluster.
+
+The configuration file for creating a KafkaConnect cluster named `connect-cluster` is https://github.com[here]
+Now let's apply it.
+
+----
+oc apply -f URL
+----
+
+Watch for the creation of the KafkaConnect cluster.
+Besides the cluster deployment, a service named `connect-cluster-connect-api` is created.
+This is the KafkaConnect API that you can use to run tasks.
+
+By default, AMQ Streams includes support for a file sink and file source KafkaConnector(s).
+We will deploy a file sink that ingests the contents of the `lines` topic that the previous applications worked with into a file.
+
+Since the `connect-cluster-connect-api` needs to be accessed from within the cluster, we will need to invoke the restful API as follows:
+
+First, we will log into one of the Kafka machines:
+
+----
+oc rsh production-ready-kafka-0
+----
+
+Then, we will invoke the RESTful API of the deployed cluster:
+
+----
+curl -X POST -H "Content-TStreamSinkConnector", "tasks.max":"1", "file":"/tmp/test.sink.txt", "topics":"lines", "value.converter.schemas.enable" : "false", "value.converter" : "org.apache.kafka.connect.storage.StringConverter", "value.converter.schemas.enable" : "false", "key.converter" : "org.apache.kafka.connect.storage.StringConverter", "key.converter.schemas.enable" : "false"}}' http://connect-cluster-connect-api.amq-streams.svc:8083/connectors
+----
+
+We will expect a response similar to:
+
+----
+{"name":"local-file-sink","config":{"connector.class":"FileStreamSinkConnector","tasks.max":"1","file":"/tmp/test.sink.txt","topics":"lines","value.converter.schemas.enable":"false","value.converter":"org.apache.kafka.connect.storage.StringConverter","key.converter":"org.apache.kafka.connect.storage.StringConverter","key.converter.schemas.enable":"false","name":"local-file-sink"},"tasks":[{"connector":"local-file-sink","task":0}],"type":null}
+----
+
+Now the job `local-file-sink` is configured to ingest data from the `lines` topic in our cluster.
+
+Let's check that the job works.
+Since the job will ingest data into a local file, we need to log into the KafkaConnect cluster pod.
+
+----
+oc get pods | grep connect-cluster
+----
+
+The output should look similar to:
+
+----
+connect-cluster-connect-5f8d958d8d-78hvz            1/1       Running   5          17h
+----
+
+Log into the pod:
+
+----
+oc rsh connect-cluster-connect-5f8d958d8d-78hvz
+----
+
+Now let's list the contents of the file:
+
+----
+sh-4.2$ more /tmp/test.sink.txt
+----
+
+The output should be the dates emitted by the `timer-producer`, in String format, e.g.:
+
+----
+Sat Jan 26 10:58:30 UTC 2019
+Sat Jan 26 10:58:35 UTC 2019
+Sat Jan 26 10:58:40 UTC 2019
+Sat Jan 26 10:58:45 UTC 2019
+Sat Jan 26 10:58:50 UTC 2019
+Sat Jan 26 10:58:55 UTC 2019
+Sat Jan 26 10:59:00 UTC 2019
+Sat Jan 26 22:42:56 UTC 2019
+Sat Jan 26 22:43:29 UTC 2019
+Sat Jan 26 22:43:34 UTC 2019
+Sat Jan 26 22:43:39 UTC 2019
+Sat Jan 26 22:43:44 UTC 2019
+Sat Jan 26 22:43:49 UTC 2019
+Sat Jan 26 22:43:54 UTC 2019
+Sat Jan 26 22:43:59 UTC 2019
+Sat Jan 26 22:44:04 UTC 2019
+Sat Jan 26 22:44:09 UTC 2019
+Sat Jan 26 22:44:14 UTC 2019
+Sat Jan 26 22:44:19 UTC 2019
+Sat Jan 26 22:44:24 UTC 2019
+Sat Jan 26 22:44:29 UTC 2019
+Sat Jan 26 22:44:34 UTC 2019
+Sat Jan 26 22:44:39 UTC 2019
+----
