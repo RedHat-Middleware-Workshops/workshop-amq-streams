@@ -34,10 +34,11 @@ Notice a few important attributes:
 Now let's deploy the `KafkaTopic` into our current project:
 
 ----
-oc apply -f examples/topic/test-topic-initial.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/topics/lines.yaml
 ----
 
 Let's wait a number of seconds and let's try to check that the topic has been created and log into one of the Kafka pods.
+You can use the command below or use the web console and the Terminal tab.
 
 ----
 oc rsh production-ready-kafka-0
@@ -46,23 +47,23 @@ oc rsh production-ready-kafka-0
 Let's get the topic information.
 
 ----
-sh-4.2$ bin/kafka-topics.sh --zookeeper localhost:2181 --topic test-topic --describe
+bin/kafka-topics.sh --zookeeper localhost:2181 --topic lines --describe
 ----
 
 The expected result should look like:
 
 ----
-OpenJDK 64-Bit Server VM warning: If the number of processors is expected to increase from one, then you should configure the number of parallel GC threads appropriately using -XX:ParallelGCThreads=N
-Topic:test-topic	PartitionCount:2	ReplicationFactor:2	Configs:segment.bytes=1073741824,retention.ms=7200000
-	Topic: test-topic	Partition: 0	Leader: 4	Replicas: 4,3	Isr: 4,3
-	Topic: test-topic	Partition: 1	Leader: 0	Replicas: 0,4	Isr: 0,4
+Topic:lines	PartitionCount:2	ReplicationFactor:1	Configs:segment.bytes=1073741824,retention.ms=7200000
+	Topic: lines	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+	Topic: lines	Partition: 1	Leader: 2	Replicas: 2	Isr: 2
 ----
+
+Exit the container shell.
 
 Now let's increase the number of partitions.
-First, we create a new resource.
+First, we need to amend the resource.
 
 ----
-cat >> test-topic-10-partitions.yaml <<'EOF'
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: KafkaTopic
 metadata:
@@ -75,19 +76,20 @@ spec:
   config:
     retention.ms: 7200000
     segment.bytes: 1073741824
-EOF
 ----
 
 Next, we will apply the new configuration.
 ----
-oc apply -f examples/topic/test-topic-10-partitions.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/topics/lines-10-partitions.yaml
 ----
 
 And let's get the topic information again.
 The topic has now 10 partitions.
 
 ----
-sh-4.2$ bin/kafka-topics.sh --zookeeper localhost:2181 --topic test-topic --describe
+oc rsh production-ready-kafka-0
+
+bin/kafka-topics.sh --zookeeper localhost:2181 --topic lines --describe
 OpenJDK 64-Bit Server VM warning: If the number of processors is expected to increase from one, then you should configure the number of parallel GC threads appropriately using -XX:ParallelGCThreads=N
 Topic:test-topic	PartitionCount:10	ReplicationFactor:2	Configs:segment.bytes=1073741824,retention.ms=7200000
 	Topic: test-topic	Partition: 0	Leader: 4	Replicas: 4,3	Isr: 4,3
