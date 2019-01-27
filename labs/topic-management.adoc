@@ -6,15 +6,13 @@ In AMQ Streams, topics are managed through a KafkaTopic resource.
 === Creating a topics
 
 Let's create a topic.
-First, we will create a YAML file.
-Execute the following command to the command line.
+The structure of a `KafkaTopic` custom resource is outlined below.
 
 ----
-cat >> test-topic-initial.yaml <<'EOF'
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: KafkaTopic
 metadata:
-  name: test-topic
+  name: lines
   labels:
     strimzi.io/cluster: production-ready
 spec:
@@ -23,7 +21,6 @@ spec:
   config:
     retention.ms: 7200000
     segment.bytes: 1073741824
-EOF
 ----
 
 Notice a few important attributes:

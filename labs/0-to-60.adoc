@@ -7,36 +7,22 @@ In this module you will learn how to install AMQ Streams on OpenShift.
 All the components are available at the [Downloads page](https://developers.redhat.com/products/amq/download/) of [https://developers.redhat.com/products/amq/overview/](https://developers.redhat.com/products/amq/overview/).
 Navigate to that page and download AMQ Streams.
 
-The downloaded file is named `install_and_examples_0.zip`.
-Extract it in your working folder and unzip it.
-Navigate inside the resulting folder.
+The zip file has been downloaded and extracted in your local directory.
 
-    $ cd <download_folder>/install_and_examples_0
-
-For the rest of the workshop, we will call this folder `$AMQSTREAMS_HOME`.
+----
+cd kafka
+----
 
 === Creating a new project for running the cluster operator
 
-Log in as the admin.
+Log in as the administrator with the password supplied by the instructor.
 
-    oc login -u admin
+    oc login -u admin master00.example.com
 
-Once you are logged in, create a new project, called `amq-streams`.
+You should already be in the `amq-streams` project.
+If it does not exist, you can create it.
 
     oc new-project amq-streams
-
-=== Logging in as cluster administrator
-
-One of the prerequisites of installing AMQ Streams on OpenShift is having access to a user with cluster administration permissions.
-For the rest of the lab, we will assume that the user `admin` has this permission - and it has been set up before the start of the class.
-
-    $ oc login -u admin $MASTER_NODE_URL
-
-[TIP]
-.Using the `system:admin` user
-====
-On clusters that you set up yourself (e.g. via `oc cluster up` on your local machine or Minishift) you can use the `system:admin` user.
-====
 
 === Configuring the cluster operator and installing it
 
@@ -44,8 +30,7 @@ The configuration files for the cluster operator are available in the `$AMQSTREA
 Let's take a quick look.
 
 ----
-$ cd install/cluster-operator
-$ ls
+$ ls install/cluster-operator
 010-ServiceAccount-strimzi-cluster-operator.yaml
 020-ClusterRole-strimzi-cluster-operator-role.yaml
 020-RoleBinding-strimzi-cluster-operator.yaml
@@ -82,7 +67,13 @@ You can do this by simply editing all files via `sed`.
 sed -i 's/namespace: .*/namespace: amq-streams/' install/cluster-operator/*RoleBinding*.yaml
 ----
 
-Let's take a look at the result in one of the modified files, e.g. `020-RoleBinding-strimzi-cluster-operator.yaml`:
+Let's take a look at the result in one of the modified files:
+
+----
+more install/cluster-operator/020-RoleBinding-strimzi-cluster-operator.yaml
+----
+
+The output should look like this:
 
 ----
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -114,7 +105,7 @@ Once the configuration files are changed, you can install the cluster operator:
 oc apply -f install/cluster-operator -n amq-streams
 ----
 
-For visualizing the result, log into the OpenShift console, with the same user you employed for creating the project, e.g. `developer`.
+For visualizing the result, log into the OpenShift console with the `admin` user.
 Navigate to the `amq-streams` project and visualize the current deployments.
 You should see the `strimzi-cluster-operator` running.
 You have just deployed the cluster operator.
@@ -122,14 +113,15 @@ You have just deployed the cluster operator.
 === Creating an Apache Kafka cluster
 
 It is time to start an Apache Kafka cluster.
-We will create now the most basic cluster possible in a new file, `simplest-cluster.yaml`.
+We will create now the most basic cluster possible.
+The configuration file is [simplest_cluster].
+You can open it - it looks like this:
 
 ----
-cat >> simplest-cluster.yaml <<'EOF'
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: Kafka
 metadata:
-  name: simplest-cluster
+  name: simple-cluster
 spec:
   kafka:
     replicas: 1
@@ -149,21 +141,19 @@ spec:
   entityOperator:
     topicOperator: {}
     userOperator: {}
-EOF
 ----
 
-Now that the resource definition is created, let's go forth and create the cluster.
-
+Now let's create the cluster by deploying this new custom resource:
 ----
-oc apply -f simplest-cluster.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/simple-cluster.yaml
 ----
 
 Again, follow the deployment from the OpenShift console.
 You should see three separate deployments:
 
-* `simplest-cluster-zookeeper` - a stateful set containing the Zookeeper ensemble
-* `simplest-cluster-kafka` - a stateful set containing the Kafka cluster
-* `simplest-cluster-entity-operator` - a deployment containing the entity operator for managing topics and users
+* `simple-cluster-zookeeper` - a stateful set containing the Zookeeper ensemble
+* `simple-cluster-kafka` - a stateful set containing the Kafka cluster
+* `simple-cluster-entity-operator` - a deployment containing the entity operator for managing topics and users
 
 === Testing the deployment
 
@@ -171,7 +161,7 @@ Now, let's quickly test that the deployed Kafka cluster works.
 Let's log into one of the cluster pods:
 
 ----
-$ oc rsh my-cluster-kafka-0
+$ oc rsh simple-cluster-kafka-0
 ----
 
 Next, let's start a producer:
@@ -187,10 +177,10 @@ Once the console producer is started, enter a few values:
 > test2
 ----
 
-Now let's log into another cluster pod in a separate terminal (you will need to `ssh` into the workstation):
+Now let's open another terminal into the cluster pod in a separate terminal (open another `ssh` terminal into the workstation):
 
 ----
-$ oc rsh my-cluster-kafka-0
+$ oc rsh simple-cluster-kafka-0
 ----
 
 And let's start a consumer:
@@ -198,6 +188,13 @@ $ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-t
 
 Once the consumer is started, you should see the previously sent messages in the output.
 Reverting to the terminal where we started the console producer and sending any new messages there will result in those messages being displayed in the consumer terminal.
+
+Finally, let's delete the Kafka cluster.
+We will replace it with a configuration that is more appropriate for real world use cases.
+
+----
+oc delete kafka simple-cluster
+----
 
 === Conclusion
 

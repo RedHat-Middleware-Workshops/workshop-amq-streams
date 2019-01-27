@@ -11,7 +11,6 @@ Note the `CAMEL_COMPONENT_KAFKA_CONFIGURATION_BROKERS` environment variable that
 The descriptor for the application is below.
 
 ----
-cat >> timer-producer-app.yaml <<'EOF'
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -32,19 +31,17 @@ spec:
           env:
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_BROKERS
               value: "production-ready-kafka-bootstrap.amq-streams.svc:9092"
-EOF
 ----
 
 Next, we deploy the application.
 
 ----
-oc apply -f timer-producer-app.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/timer-producer.yaml
 ----
 
-Now, let's deploy the message consumer.
+We also have a simple application that consumes messages.
 
 ----
-cat >> log-consumer-app.yaml <<'EOF'
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -67,27 +64,30 @@ spec:
               value: "production-ready-kafka-bootstrap.amq-streams.svc:9092"
 ----
 
+Now, let's deploy the message consumer.
+
 ----
-oc apply -f log-consumer-app.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer.yaml
 ----
 
-Let's make sure that everything works.
+Make sure that everything works and all the applications are started, then we will validate that the applications communicate with each other.
 First, let's find the pod address.
 
 ----
 oc get pods | grep log-consumer
 ----
 
-The result should be something along the lines of:
+Wait until the container is running/
+The result should be something along the lines of (notice that the pod id will be different - copy it for the next step):
 
 ----
-log-consumer-5d4586bdcd-slrdk                       0/1       ContainerCreating   0          28s
+log-consumer-5d4586bdcd-gm9xp                       1/1       Running   0          41s
 ----
 
 Now let's tail the logs from the consumer (use the pod id retrieved in the previous step).
 
 ----
-oc logs -f pod/log-consumer-<pod-id>  -c log-consumer --tail=-1
+oc logs -f pod/log-consumer-5d4586bdcd-gm9xp  -c log-consumer --tail=-1
 ----
 
 We expect the output to look like as follows:
@@ -107,4 +107,4 @@ We expect the output to look like as follows:
 2019-01-27 07:58:21.160  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:58:21 UTC 2019
 ----
 
-This indicates that the two applications communicate with each other. 
+Messages should continue to arrive every five seconds, and this indicates that the two applications communicate with each other.

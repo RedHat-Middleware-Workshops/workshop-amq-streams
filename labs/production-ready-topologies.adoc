@@ -25,7 +25,7 @@ Let's take a quick look at the resource descriptor for the cluster we just deplo
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: Kafka
 metadata:
-  name: simplest-cluster
+  name: simple-cluster
 spec:
   kafka:
     replicas: 1
@@ -75,9 +75,9 @@ oc delete kafka simple-cluster
 ----
 
 Now let's create a new resource.
+The definition of the cluster is below:
 
 ----
-cat >> production-ready.yaml <<'EOF'
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: Kafka
 metadata:
@@ -105,13 +105,12 @@ spec:
   entityOperator:
     topicOperator: {}
     userOperator: {}
-EOF
 ----
 
 Let's deploy this new resource.
 
 ----
-oc apply -f production-ready.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
 ----
 
 The cluster `production-ready` has the minimal settings for a highly available, persistent cluster.
@@ -123,14 +122,14 @@ The cluster `production-ready` has the minimal settings for a highly available, 
 Note that while the minimum number is 3 for both, the number of Kafka brokers is likely to be different from the number of ZooKeeper nodes.
 The latter may be less than the number of Kafka brokers.
 Other settings control the replication factors for offsets and transaction logs.
-A minimum of two is recommended. 
+A minimum of two is recommended.
 
 ==== Scaling up the cluster
 
 Let us scale up the cluster.
+A corresponding resource would look like below (note that the only property that changes is `spec.kafka.replicas`).
 
 ----
-cat >> production-ready-5-nodes.yaml <<'EOF'
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: Kafka
 metadata:
@@ -158,21 +157,20 @@ spec:
   entityOperator:
     topicOperator: {}
     userOperator: {}
-EOF
 ----
 
 Notice the only change being the number of nodes.
 Let's apply this new configuration:
 
 ----
-oc apply -f production-ready-5-nodes.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready-5-nodes.yaml
 ----
 
 Notice the number of pods of the Kafka cluster increasing to 5 and the corresponding persistent claims.
 Now let's scale down the cluster again.
 
 ----
-oc apply -f production-ready.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
 ----
 
 Notice the number of pods of the Kafka cluster decreasing back to 3.
@@ -181,8 +179,15 @@ What does this mean?
 Let's scale up the cluster again.
 
 ----
-oc apply -f production-ready-5-nodes.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready-5-nodes.yaml
 ----
 
-Notice the number of pods increasing back to 5 and the corresponding claims being reallocated to the existing nodes.
+Notice the number of pods increasing back to 5 and the corresponding persistent volume claims being reallocated to the existing nodes.
 This means that the newly started instances will resume from where the previous instances 3 and 4 left off.
+
+Three broker nodes will be sufficient for our lab, so we can scale things down again:
+
+----
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
+
+----

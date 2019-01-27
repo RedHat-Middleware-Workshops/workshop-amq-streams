@@ -8,9 +8,9 @@ This is the lab section of the AMQ Streams workshop.
 
 . link:./production-ready-topologies.adoc[Production-ready topologies: sizing and persistence]
 
-. link:./understanding-the-application-ecosystem.adoc[Understanding the Kafka application ecosystem]
-
 . link:./topic-management.adoc[Topic management]
+
+. link:./understanding-the-application-ecosystem.adoc[Understanding the Kafka application ecosystem]
 
 . link:./clients-within-outside-OCP.adoc[Clients: within OCP and outside OCP]
 
