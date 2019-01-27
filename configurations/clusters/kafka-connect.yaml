@@ -1,0 +1,7 @@
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaConnect
+metadata:
+  name: connect-cluster
+spec:
+  replicas: 1
+  bootstrapServers: production-ready-kafka-bootstrap.amq-streams.svc:9092

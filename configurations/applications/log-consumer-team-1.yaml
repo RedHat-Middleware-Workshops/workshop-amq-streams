@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: timer-producer
+  name: log-consumer
   labels:
     app: kafka-workshop
 spec:
@@ -10,11 +10,11 @@ spec:
     metadata:
       labels:
         app: kafka-workshop
-        name: timer-producer
+        name: log-consumer
     spec:
       containers:
-        - name: timer-producer
-          image: docker.io/mbogoevici/timer-producer:latest
+        - name: log-consumer
+          image: docker.io/mbogoevici/log-consumer:latest
           env:
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_BROKERS
               value: "production-ready-kafka-bootstrap.amq-streams.svc:9092"
