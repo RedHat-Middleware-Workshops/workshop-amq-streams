@@ -1,14 +1,23 @@
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: RoleBinding
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: Kafka
 metadata:
-  name: strimzi-cluster-operator
-  labels:
-    app: strimzi
-subjects:
-- kind: ServiceAccount
-  name: strimzi-cluster-operator
-  namespace: amq-streams
-roleRef:
-  kind: ClusterRole
-  name: strimzi-cluster-operator-namespaced
-  apiGroup: rbac.authorization.k8s.io
+  name: simple-cluster
+spec:
+  kafka:
+    replicas: 1
+    listeners:
+      plain: {}
+      tls: {}
+    config:
+      offsets.topic.replication.factor: 1
+      transaction.state.log.replication.factor: 1
+      transaction.state.log.min.isr: 1
+    storage:
+      type: ephemeral
+  zookeeper:
+    replicas: 1
+    storage:
+      type: ephemeral
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
