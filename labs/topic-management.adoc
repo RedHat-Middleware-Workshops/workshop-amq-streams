@@ -80,7 +80,7 @@ spec:
 
 Next, we will apply the new configuration.
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/topics/lines-10-partitions.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/topics/lines-10.yaml
 ----
 
 And let's get the topic information again.
@@ -91,14 +91,17 @@ oc rsh production-ready-kafka-0
 
 bin/kafka-topics.sh --zookeeper localhost:2181 --topic lines --describe
 OpenJDK 64-Bit Server VM warning: If the number of processors is expected to increase from one, then you should configure the number of parallel GC threads appropriately using -XX:ParallelGCThreads=N
-Topic:test-topic	PartitionCount:10	ReplicationFactor:2	Configs:segment.bytes=1073741824,retention.ms=7200000
-	Topic: test-topic	Partition: 0	Leader: 4	Replicas: 4,3	Isr: 4,3
-	Topic: test-topic	Partition: 1	Leader: 0	Replicas: 0,4	Isr: 0,4
-	Topic: test-topic	Partition: 2	Leader: 1	Replicas: 1,2	Isr: 1,2
-	Topic: test-topic	Partition: 3	Leader: 2	Replicas: 2,3	Isr: 2,3
-	Topic: test-topic	Partition: 4	Leader: 3	Replicas: 3,4	Isr: 3,4
-	Topic: test-topic	Partition: 5	Leader: 4	Replicas: 4,1	Isr: 4,1
-	Topic: test-topic	Partition: 6	Leader: 0	Replicas: 0,2	Isr: 0,2
-	Topic: test-topic	Partition: 7	Leader: 1	Replicas: 1,3	Isr: 1,3
-	Topic: test-topic	Partition: 8	Leader: 2	Replicas: 2,4	Isr: 2,4
-	Topic: test-topic	Partition: 9	Leader: 3	Replicas: 3,0	Isr: 3,0
+Topic:lines	PartitionCount:10	ReplicationFactor:2	Configs:segment.bytes=1073741824,retention.ms=7200000
+	Topic: lines	Partition: 0	Leader: 4	Replicas: 4,3	Isr: 4,3
+	Topic: lines	Partition: 1	Leader: 0	Replicas: 0,4	Isr: 0,4
+	Topic: lines	Partition: 2	Leader: 1	Replicas: 1,2	Isr: 1,2
+	Topic: lines	Partition: 3	Leader: 2	Replicas: 2,3	Isr: 2,3
+	Topic: lines	Partition: 4	Leader: 3	Replicas: 3,4	Isr: 3,4
+	Topic: lines	Partition: 5	Leader: 4	Replicas: 4,1	Isr: 4,1
+	Topic: lines	Partition: 6	Leader: 0	Replicas: 0,2	Isr: 0,2
+	Topic: lines	Partition: 7	Leader: 1	Replicas: 1,3	Isr: 1,3
+	Topic: lines	Partition: 8	Leader: 2	Replicas: 2,4	Isr: 2,4
+	Topic: lines	Partition: 9	Leader: 3	Replicas: 3,0	Isr: 3,0
+----
+
+Now that the topic has been created, we can start running some applications. 

@@ -12,10 +12,10 @@ For this exercise, we will install our own instance of Prometheus and Grafana fo
 
 === Instrumenting the Kafka cluster
 
-We add coniguration the metrics instrumentation for the `production-ready` cluster.
+We will reconfigure the `production-ready` cluster to advertise metrics.s
 
 ----
-oc apply -f https://raw.githubusercontent.com/kasriniv/workshop-amq-streams/master/labs/lab08-Monitoring/kafka-cluster3-metrics.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready-monitored.yaml
 ----
 
 === Installing Prometheus
@@ -53,7 +53,7 @@ Get the route:
 oc get routes
 ----
 
-It should be similar to : grafana-myproject.apps-<GUID>.rhpds.com
+It should be similar to : http://grafana-amq-streams.apps-<GUID>.generic.opentlc.com
 
 Login as `admin`/`admin` to the Grafana dashboard on your browser with the URL from above.
 You can also change the admin password if you'd like.
@@ -66,9 +66,10 @@ Go to the `Gear' icon on the left and then pick *Datasources*.
 Fill following values:
   name: prometheus
   type: prometheus
-  url:  `http://prometheus-myproject.apps.<YOUR ID>.rhpds.com`
+  url:  `http://prometheus-amq-streams.apps-<GUID>.generic.opentlc.com `
 
-Save and Test. You should see a 'data source tested' message.
+Save and Test.
+You should see a 'data source tested' message.
 
 Import Dashboard definitions.
 Go to the + on the top left and choose "import".

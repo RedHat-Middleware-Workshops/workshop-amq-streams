@@ -1,10 +1,7 @@
-== Connecting: within and outside OCP
+== Connecting from outside OCP
 
 As you have seen, a Kafka cluster deployed in OpenShift can be used by other applications deployed in the same OpenShift instance.
 This is the primary use case.
-
-=== Accessing Kafka from within the cluster
-
 
 === Configuring external routes
 
@@ -14,7 +11,6 @@ Let's see how that can be enabled.
 First, we need to reconfigure the cluster with an `external` listener.
 
 ----
-cat >> production-ready-external-routes.yaml <<'EOF'
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: Kafka
 metadata:
@@ -33,7 +29,7 @@ spec:
       transaction.state.log.min.isr: 2
     storage:
       type: persistent-claim
-      size: 50Gi
+      size: 3Gi
       deleteClaim: false
   zookeeper:
     replicas: 3
@@ -44,23 +40,21 @@ spec:
   entityOperator:
     topicOperator: {}
     userOperator: {}
-EOF
 ----
 
 Now let's apply this configuration to the running cluster.
 
 ----
-oc apply -f production-ready-external-routes.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready-external-routes.yaml
 ----
 
 Now you can inspect the existing services.
-Notice that each of the brokers in the cluster has a route.
-A new service has been created for external connections.
+Notice that each of the brokers in the cluster has a route and a new bootstrap service has been created for external connections.
 
 === Connecting external clients
 
+For interacting with the broker, external clients must use TLS.
 First, we need to extract the certificate of the server.
-
 ----
 oc extract secret/production-ready-cluster-ca-cert --keys=ca.crt --to=- >certificate.crt
 ----
