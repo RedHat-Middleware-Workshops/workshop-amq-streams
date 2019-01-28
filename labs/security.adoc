@@ -1,13 +1,14 @@
 == Security for clusters and topics
 
+In this module we will show you how to secure a cluster and how to create and manage users.
+
 === Securing listeners
 
 The first step for securing a Kafka cluster is securing its listeners.
 You can add security options to each of the configured listeners.
-For example, let us change the cluster definition:
+For example, let us change the cluster definition for the plain listener.
 
 ----
-cat >> production-ready-secured.yaml <<'EOF'
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: Kafka
 metadata:
@@ -43,7 +44,7 @@ EOF
 Let's deploy the new configuration:
 
 ----
-oc apply -f production-ready-secured.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready-secured.yaml
 ----
 
 The `plain` listener is now configured to use the `SCRAM` challenge mechanism for connecting clients.
@@ -55,7 +56,6 @@ Users are managed through `KafkaUser` resources, which also manage the user auth
 Let's create our first user.
 
 ----
-cat >> secured-topic-reader.yaml <<'EOF'
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: KafkaUser
 metadata:
@@ -87,25 +87,24 @@ spec:
           patternType: literal
         operation: Read
         host: "*"
-EOF
 ----
 
 Let's apply this new configuration.
 
 ----
-oc apply -f test-topic-reader-user.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/users/secure-topic-reader.yaml
 ----
 
 The newly created user can read the metadata of topic `test-topic` and consume (read) from it with the consumer group `test-group`.
 
 But now we need a user that can produce data to `test-topic`!
 Let's create a new resource:
+
 ----
-cat >> secure-topic-writer.yaml <<'EOF'
-apiVersion: kafka.strimzi.io/v1alpha1
+aapiVersion: kafka.strimzi.io/v1alpha1
 kind: KafkaUser
 metadata:
-  name: test-topic-writer
+  name: secure-topic-writer
   labels:
     strimzi.io/cluster: production-ready
 spec:
@@ -114,33 +113,28 @@ spec:
   authorization:
     type: simple
     acls:
-      # Example Producer Acls for topic my-topic
+      # Example Producer Acls for topic secure-topic
       - resource:
           type: topic
-          name: streams-plaintext-input
+          name: secure-topic
           patternType: literal
         operation: Write
         host: "*"
-EOF
 ----
 
 And let's apply this new configuration.
 ----
-oc apply -f test-topic-reader-user.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/users/secure-topic-writer.yaml
 ----
 
-Go to `Secrets` and observe that new secret named `test-topic-reader` and `test-topic-writer` have been created.
-This secret has a field named `password`.
-This is the password to be used by the user.
+Go to `Secrets` and observe that new secret named `secure-topic-reader` and `secure-topic-writer` have been created.
+Both secrets have a field named `password`.
 
 Now let's redeploy our running applications.
 Looking at the logs, we see a lot of errors - the clients cannot connect anymore.
 
 We need to reconfigure the running apps:
-
-
 ----
-cat >> timer-producer-app.yaml <<'EOF'
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -161,15 +155,30 @@ spec:
           env:
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_BROKERS
               value: "production-ready-kafka-bootstrap.amq-streams.svc:9092"
-EOF
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_SASL_JAAS_CONFIG
+              value: org.apache.kafka.common.security.scram.ScramLoginModule required username='${KAFKA_USER}' password='${KAFKA_PASSWORD}';
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_SASL_MECHANISM
+              value: SCRAM-SHA-512
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_SECURITY_PROTOCOL
+              value: SASL_PLAINTEXT
+            - name: KAFKA_USER
+              value: secure-topic-writer
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: secure-topic-writer
 ----
 
-----
-oc apply -f timer-producer-app.yaml
-----
+Now let's deploy this new configuration.
 
 ----
-cat >> log-consumer-app.yaml <<'EOF'
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/timer-producer-secured.yaml
+----
+
+We need to secure the `log-consumer` application as well:
+
+----
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -189,56 +198,29 @@ spec:
           image: docker.io/mbogoevici/log-consumer:latest
           env:
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_BROKERS
-              value: "production-ready-kafka-bootstrap.amq-streams.svc:9092"
+              value: "production-ready-kafka-bootstrap.dev-team-1.svc:9092"
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_GROUP_ID
-              value: testGroup
+              value: secure-group
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_SASL_JAAS_CONFIG
-              value: org.apache.kafka.common.security.scram.ScramLoginModule required username=${KAFKA_USER} password=${KAFKA_PASSWORD}
+              value: org.apache.kafka.common.security.scram.ScramLoginModule required username='${KAFKA_USER}' password='${KAFKA_PASSWORD}';
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_SASL_MECHANISM
               value: SCRAM-SHA-512
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_SECURITY_PROTOCOL
               value: SASL_PLAINTEXT
             - name: KAFKA_USER
-              value: test-topic-reader
+              value: secure-topic-reader
             - name: KAFKA_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: test-topic-reader
+                  name: secure-topic-reader
 ----
 
+Let's apply this new configuration:
 
 ----
-camel.component.kafka.configuration.brokers=my-cluster-kafka-bootstrap.amq-streams.svc:9092
-camel.component.kafka.configuration.group-id=testGroup
-camel.component.kafka.configuration.sasl-jaas-config=;
-camel.component.kafka.configuration.sasl-mechanism=SCRAM-SHA-512
-camel.component.kafka.configuration.security-protocol=SASL_PLAINTEXT
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer-secured.yaml
 ----
 
-Where do the values for `$KAFKA_USER` and `$KAFKA_PASSWORD` come from?
-They need to be injected into the configuration from the deployment.
-
-Let's add the two propertie to the deployment:
-
-----
-- name: KAFKA_USER
-  value: test-topic-reader
-- name: KAFKA_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      key: password
-      name: test-topic-reader
-----
-
-and
-
-----
-- name: KAFKA_USER
-  value: test-topic-writer
-- name: KAFKA_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      key: password
-      name: test-topic-writer
-----
+Inspect the log of `log-consumer` again.
+You should see the messages being exchanged.

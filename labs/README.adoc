@@ -22,4 +22,4 @@ This is the lab section of the AMQ Streams workshop.
 
 . link:./watching-multiple-namespaces.adoc[Watching multiple namespaces]
 
-. link:./mirror-maker.adoc[Replicating Data with MirrorMaker)
+. link:./mirror-maker.adoc[Replicating Data with MirrorMaker]
