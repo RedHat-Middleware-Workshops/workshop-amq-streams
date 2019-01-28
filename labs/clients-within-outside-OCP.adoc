@@ -66,3 +66,19 @@ keytool -import -trustcacerts -alias root -file certificate.crt -keystore keysto
 ----
 
 We can now run our producer and consumer applications by using this certificate.
+
+Let's download the two JARs.
+
+----
+wget -o log-consumer.jar https://github.com/mbogoevici/workshop-amq-streams/blob/master/bin/log-consumer.jar?raw=true
+wget -o timer-producer.jar https://github.com/mbogoevici/workshop-amq-streams/blob/master/bin/timer-producer?raw=true
+----
+
+
+----
+java -jar log-consumer.jar --camel.component.kafka.configuration.brokers=production-ready-kafka-bootstrap-amq-streams.apps-3a80.generic.opentlc.com:443 --camel.component.kafka.configuration.security-protocol=SSL --camel.component.kafka.configuration.ssl-truststore-location=keystore.jks --camel.component.kafka.configuration.ssl-truststore-password=password
+----
+
+----
+java -jar timer-producer.jar --camel.component.kafka.configuration.brokers=production-ready-kafka-bootstrap-amq-streams.apps-3a80.generic.opentlc.com:443 --camel.component.kafka.configuration.security-protocol=SSL --camel.component.kafka.configuration.ssl-truststore-location=keystore.jks --camel.component.kafka.configuration.ssl-truststore-password=password --server.port=0
+----
