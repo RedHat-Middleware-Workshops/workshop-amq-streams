@@ -201,9 +201,11 @@ Exit the `root` account and the `master` machine and return to the workstation c
 Assign the two users to the previously created projects:
 
 ----
-oadm policy add-role-to-user admin dev-team-1 -n team-1
-oadm policy add-role-to-user admin dev-team-2 -n team-2
+oc adm policy add-role-to-user admin dev-team-1 -n team-1
+oc adm policy add-role-to-user admin dev-team-2 -n team-2
 ----
+
+Exit the `root` account and the remote shell into the `master00` machine.
 
 Log into one of the users and change current project:
 
@@ -221,8 +223,10 @@ You should see the operation failing with an error along the lines of `Error fro
 Your user does not have permission to update the custom resources.
 
 To correct that, we will first create a `StrimziAdmin` cluster role that we can assign to users.
+Log in as `admin` and apply the roles.
 
 ----
+oc login -u admin
 oc apply -f strimzi-admin.yaml
 ----
 
@@ -232,9 +236,10 @@ Assign the cluster role to the newly created users.
 oc adm policy add-cluster-role-to-user strimzi-admin dev-team-1 dev-team-2
 ----
 
-Now try to repeat the operation.
+Now log in again try to repeat the operation.
 
 ----
+oc login -u test-2
 oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
 ----
 

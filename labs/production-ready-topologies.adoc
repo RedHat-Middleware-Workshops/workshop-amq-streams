@@ -189,5 +189,4 @@ Three broker nodes will be sufficient for our lab, so we can scale things down a
 
 ----
 oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
-
 ----

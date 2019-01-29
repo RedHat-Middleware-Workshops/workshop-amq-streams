@@ -10,13 +10,23 @@ In this lab we will show how data can be replicated between Kafka clusters using
 
 First, we will change the `log-consumer` app.
 
+Let's log back as `admin`.
+
+----
+oc login -u admin
+----
+
+----
+oc project amq-streams
+----
+
 ----
 oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/timer-producer-team-1.yaml
 oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer-team-2.yaml
 ----
 
 Now the `log-consumer` application consumes data from cluster `test-2`, while `timer-producer` sends data to cluster `test-1`.
-If we log its output, we will see that no data is received.
+If we look at `log-consumer`s output, we will see that no data is received.
 
 We can confirm that pointing the application to the cluster `test-1` will yield data.
 ----
@@ -27,6 +37,8 @@ oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/ma
 
 We will use the clusters previously created in this workshop in the `test-1` and `test-2` namespaces as source and target clusters.
 
+Make sure that you're still logged in as `admin`.
+
 ----
 oc login -u admin
 oc project amq-streams
@@ -35,7 +47,7 @@ oc project amq-streams
 Now let's deploy MirrorMaker.
 
 ----
-oc apply -f https://raw.githubusercontent.com/kasriniv/workshop-amq-streams/master/labs/lab07-mirrormaker/kafka-mirror-maker-lab.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/mirror-maker.yaml
 ----
 
 The notions of producer and consumer are from MirrorMaker's perspective.
