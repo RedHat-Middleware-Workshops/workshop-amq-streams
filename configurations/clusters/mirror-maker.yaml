@@ -6,8 +6,8 @@ spec:
   image: strimzi/kafka-mirror-maker:latest
   replicas: 1
   consumer:
-    bootstrapServers: production-ready-kafka-bootstrap.team-1.svc
-    groupId: mirro-maker-group-id
+    bootstrapServers: production-ready-kafka-bootstrap.team-1.svc:9092
+    groupId: mirror-maker-group-id
   producer:
-    bootstrapServers: production-ready-kafka-bootstrap.team-2.svc
+    bootstrapServers: production-ready-kafka-bootstrap.team-2.svc:9092
   whitelist: "lines|test-topic"
