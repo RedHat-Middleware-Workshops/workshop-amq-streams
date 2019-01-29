@@ -1,7 +1,7 @@
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: Kafka
 metadata:
-  name: production-ready
+  name: simple-cluster
 spec:
   kafka:
     replicas: 1
