@@ -6,7 +6,7 @@ The configuration file for creating a KafkaConnect cluster named `connect-cluste
 Now let's apply it.
 
 ----
-oc apply -f URL
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/kafka-connect.yaml
 ----
 
 Watch for the creation of the KafkaConnect cluster.
