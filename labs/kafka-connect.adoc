@@ -2,7 +2,7 @@
 
 We will start by deploying a KafkaConnect cluster.
 
-The configuration file for creating a KafkaConnect cluster named `connect-cluster` is https://github.com[here]
+The configuration file for creating a KafkaConnect cluster named `connect-cluster` is https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/kafka-connect.yaml[here].
 Now let's apply it.
 
 ----
