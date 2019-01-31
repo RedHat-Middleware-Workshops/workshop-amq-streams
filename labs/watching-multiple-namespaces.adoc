@@ -208,7 +208,7 @@ Exit the `root` account and the remote shell into the `master00` machine.
 Log into one of the users and change current project:
 
 ----
-oc login -u dev-team-2
+oc login -u dev-team-2 master00.example.com
 ----
 
 Change the cluster configuration:
@@ -224,7 +224,7 @@ To correct that, we will first create a `StrimziAdmin` cluster role that we can 
 Log in as `admin` and apply the roles.
 
 ----
-oc login -u admin
+oc login -u admin master00.example.com
 oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/users/strimzi-admin.yaml
 ----
 
@@ -237,7 +237,7 @@ oc adm policy add-cluster-role-to-user strimzi-admin dev-team-1 dev-team-2
 Now log in again try to repeat the operation.
 
 ----
-oc login -u dev-team-2
+oc login -u dev-team-2 master00.example.com
 oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
 ----
 
