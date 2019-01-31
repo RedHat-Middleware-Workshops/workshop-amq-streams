@@ -5,3 +5,9 @@ metadata:
 spec:
   replicas: 1
   bootstrapServers: production-ready-kafka-bootstrap.amq-streams.svc:9092
+  authentication:
+    type: scram-sha-512
+    username: secure-topic-reader
+    passwordSecret:
+      secretName: secure-topic-reader
+      password: password
