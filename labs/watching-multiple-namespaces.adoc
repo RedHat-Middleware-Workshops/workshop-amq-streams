@@ -227,7 +227,7 @@ Log in as `admin` and apply the roles.
 
 ----
 oc login -u admin
-oc apply -f strimzi-admin.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/users/strimzi-admin.yaml
 ----
 
 Assign the cluster role to the newly created users.
