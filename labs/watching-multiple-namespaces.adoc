@@ -196,8 +196,6 @@ htpasswd /etc/origin/master/htpasswd dev-team-1
 htpasswd /etc/origin/master/htpasswd dev-team-2
 ----
 
-Exit the `root` account and the `master` machine and return to the workstation console.
-
 Assign the two users to the previously created projects:
 
 ----
@@ -239,7 +237,7 @@ oc adm policy add-cluster-role-to-user strimzi-admin dev-team-1 dev-team-2
 Now log in again try to repeat the operation.
 
 ----
-oc login -u test-2
+oc login -u dev-team-2
 oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
 ----
 
