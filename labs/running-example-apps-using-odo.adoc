@@ -1,0 +1,33 @@
+== Running example apps using ODO
+
+Prerequisite: ODO is installed https://github.com/redhat-developer/odo/releases
+
+Go to apps/timer-producer.
+
+mvn package
+
+odo login 
+
+odo app create timerproducer
+
+odo create java timerproducerapp --binary target/time-producer-0.0.1-SNAPSHOT.jar --env camel.component.kafka.configuration.brokers=my-cluster-kafka-bootstrap:9092
+
+Go to apps/log-consumer
+
+odo app create logconsumer
+
+odo create java logconsumerapp --binary target/log-consumer-0.0.1-SNAPSHOT.jar
+
+odo log -f
+
+odo push
+
+odo log -f 
+
+and see those messages appear.
+
+Clean up:
+
+odo delete timerproducer
+odo delete logconsumer
+
