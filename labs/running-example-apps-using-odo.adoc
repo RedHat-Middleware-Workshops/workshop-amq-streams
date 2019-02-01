@@ -30,6 +30,22 @@ odo app create timerproducer
 odo create java timerproducerapp --binary target/time-producer-0.0.1-SNAPSHOT.jar --env camel.component.kafka.configuration.brokers=my-cluster-kafka-bootstrap:9092
 ----
 
+Wait for dev pod to initialize
+----
+odo log -f
+----
+
+Push your app to dev pod.
+----
+odo push
+----
+
+See it initializing.
+----
+odo log -f 
+----
+
+
 === Install log consumer
 
 Go to apps/log-consumer
@@ -54,7 +70,7 @@ odo push
 odo log -f 
 ----
 
-and see those messages appear.
+and see those messages consumer is sending periodically appear.
 
 === Clean up
 
