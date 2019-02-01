@@ -2,9 +2,9 @@
 
 If you want have examples running easily on your cluster you can either try 
 
---
-mvn fabri8:deploy
---
+----
+mvn fabric8:deploy
+----
 
 Or use Openshift Do.
 
@@ -14,40 +14,52 @@ Prerequisite: ODO is installed https://github.com/redhat-developer/odo/releases
 === Install timer producer
 Go to apps/timer-producer.
 
---
+----
 mvn package
---
+----
 
---
+----
 odo login master.ocp.host:8443 --token=xxxxxxxxxxxxxxxxxxxxxxx
---
+----
 
---
+----
 odo app create timerproducer
---
+----
 
---
+----
 odo create java timerproducerapp --binary target/time-producer-0.0.1-SNAPSHOT.jar --env camel.component.kafka.configuration.brokers=my-cluster-kafka-bootstrap:9092
---
+----
 
-=== install log consumer
+=== Install log consumer
 
 Go to apps/log-consumer
 
+----
 odo app create logconsumer
+----
 
+----
 odo create java logconsumerapp --binary target/log-consumer-0.0.1-SNAPSHOT.jar
+----
 
+----
 odo log -f
+----
 
+----
 odo push
+----
 
+----
 odo log -f 
+----
 
 and see those messages appear.
 
-Clean up:
+=== Clean up
 
+----
 odo delete timerproducer
 odo delete logconsumer
+----
 
