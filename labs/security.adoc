@@ -47,6 +47,8 @@ Let's deploy the new configuration:
 oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready-secured.yaml
 ----
 
+Watch for the changes in the stateful set.
+Once all pods have been restarted, you can proceed.
 The `plain` listener is now configured to use the `SCRAM` challenge mechanism for connecting clients.
 
 === Creating users and ACLs
@@ -131,6 +133,12 @@ Go to `Secrets` and observe that new secret named `secure-topic-reader` and `sec
 Both secrets have a field named `password`.
 
 Now let's redeploy our running applications.
+
+----
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/timer-producer.yaml
+oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer.yaml
+----
+
 Looking at the logs, we see a lot of errors - the clients cannot connect anymore.
 
 We need to reconfigure the running apps:

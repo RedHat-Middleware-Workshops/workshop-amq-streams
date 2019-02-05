@@ -39,6 +39,8 @@ Next, we deploy the application.
 oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/timer-producer.yaml
 ----
 
+
+
 We also have a simple application that consumes messages.
 
 ----
@@ -62,6 +64,8 @@ spec:
           env:
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_BROKERS
               value: "production-ready-kafka-bootstrap.amq-streams.svc:9092"
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_GROUP_ID
+              value: test-group
 ----
 
 Now, let's deploy the message consumer.
@@ -71,13 +75,13 @@ oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/ma
 ----
 
 Make sure that everything works and all the applications are started, then we will validate that the applications communicate with each other.
-First, let's find the pod address.
+First, let's find the pod address for the consumer.
 
 ----
 oc get pods | grep log-consumer
 ----
 
-Wait until the container is running/
+Wait until the container is running.
 The result should be something along the lines of (notice that the pod id will be different - copy it for the next step):
 
 ----
@@ -87,24 +91,17 @@ log-consumer-5d4586bdcd-gm9xp                       1/1       Running   0       
 Now let's tail the logs from the consumer (use the pod id retrieved in the previous step).
 
 ----
-oc logs -f pod/log-consumer-5d4586bdcd-gm9xp  -c log-consumer --tail=-1
+oc logs -f pod/log-consumer-<pod-id>  -c log-consumer --tail=-1
 ----
 
 We expect the output to look like as follows:
 
 ----
-2019-01-27 07:57:26.219  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:26 UTC 2019
-2019-01-27 07:57:31.165  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:31 UTC 2019
-2019-01-27 07:57:36.159  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:36 UTC 2019
-2019-01-27 07:57:41.158  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:41 UTC 2019
-2019-01-27 07:57:46.166  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:46 UTC 2019
-2019-01-27 07:57:51.158  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:51 UTC 2019
-2019-01-27 07:57:56.159  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:57:56 UTC 2019
-2019-01-27 07:58:01.163  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:58:01 UTC 2019
-2019-01-27 07:58:06.157  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:58:06 UTC 2019
-2019-01-27 07:58:11.160  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:58:11 UTC 2019
-2019-01-27 07:58:16.159  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:58:16 UTC 2019
-2019-01-27 07:58:21.160  INFO 1 --- [Consumer[lines]] route1                                   : Sun Jan 27 07:58:21 UTC 2019
+2019-02-05 16:29:05.833  INFO 1 --- [Consumer[lines]] route1                                   : Message 209 at Tue Feb 05 16:29:05 UTC 2019
+2019-02-05 16:29:10.835  INFO 1 --- [Consumer[lines]] route1                                   : Message 210 at Tue Feb 05 16:29:10 UTC 2019
+2019-02-05 16:29:15.835  INFO 1 --- [Consumer[lines]] route1                                   : Message 211 at Tue Feb 05 16:29:15 UTC 2019
+2019-02-05 16:29:20.838  INFO 1 --- [Consumer[lines]] route1                                   : Message 212 at Tue Feb 05 16:29:20 UTC 2019
+2019-02-05 16:29:25.833  INFO 1 --- [Consumer[lines]] route1                                   : Message 213 at Tue Feb 05 16:29:25 UTC 2019
 ----
 
 Messages should continue to arrive every five seconds, and this indicates that the two applications communicate with each other.

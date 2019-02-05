@@ -127,7 +127,7 @@ You have just deployed the cluster operator.
 
 It is time to start an Apache Kafka cluster.
 We will create now the most basic cluster possible.
-The configuration file is [simplest_cluster].
+The configuration file is https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/simple-cluster.yaml[here].
 You can open it - it looks like this:
 
 ----
@@ -190,6 +190,18 @@ Once the console producer is started, enter a few values:
 > test2
 ----
 
+(Do not worry if you see the warnings below.
+They are part of the interaction and indicate that the topic has not been found and broker will autocreate the `test-topic`.
+The message `test` will be properly received by Kafka).
+
+----
+OpenJDK 64-Bit Server VM warning: If the number of processors is expected to increase from one, then you should configure the number of parallel GC threads appropriately using -XX:ParallelGCThreads=N
+>test
+[2019-02-05 15:32:46,828] WARN [Producer clientId=console-producer] Error while fetching metadata with correlation id 1 : {test-topic=LEADER_NOT_AVAILABLE} (org.apache.kafka.clients.NetworkClient)
+[2019-02-05 15:32:46,939] WARN [Producer clientId=console-producer] Error while fetching metadata with correlation id 3 : {test-topic=LEADER_NOT_AVAILABLE} (org.apache.kafka.clients.NetworkClient)
+>test2
+----
+
 Now let's open another terminal into the cluster pod in a separate terminal (open another `ssh` terminal into the workstation):
 
 ----
@@ -209,6 +221,53 @@ Now let's exit from the terminal of both containers.
 
 ----
 exit
+----
+
+=== Kafka clusters and Kafka resources
+
+The Kafka resource we just created is a representation of the running Kafka cluster.
+You can use it to inspect and modify the current cluster configuration.
+For example:
+
+----
+oc get kafka simple-cluster -o yaml
+----
+
+Will yield a detailed representation of the resource on the cluster:
+
+----
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: Kafka
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kafka.strimzi.io/v1alpha1","kind":"Kafka","metadata":{"annotations":{},"name":"simple-cluster","namespace":"amq-streams"},"spec":{"entityOperator":{"topicOperator":{},"userOperator":{}},"kafka":{"config":{"offsets.topic.replication.factor":1,"transaction.state.log.min.isr":1,"transaction.state.log.replication.factor":1},"listeners":{"plain":{},"tls":{}},"replicas":1,"storage":{"type":"ephemeral"}},"zookeeper":{"replicas":1,"storage":{"type":"ephemeral"}}}}
+  creationTimestamp: 2019-02-05T15:27:11Z
+  generation: 1
+  name: simple-cluster
+  namespace: amq-streams
+  resourceVersion: "136009"
+  selfLink: /apis/kafka.strimzi.io/v1alpha1/namespaces/amq-streams/kafkas/simple-cluster
+  uid: 81e3ddbe-295a-11e9-bbf1-2cabcdef0010
+spec:
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+  kafka:
+    config:
+      offsets.topic.replication.factor: 1
+      transaction.state.log.min.isr: 1
+      transaction.state.log.replication.factor: 1
+    listeners:
+      plain: {}
+      tls: {}
+    replicas: 1
+    storage:
+      type: ephemeral
+  zookeeper:
+    replicas: 1
+    storage:
+      type: ephemeral
 ----
 
 Finally, let's delete the Kafka cluster.

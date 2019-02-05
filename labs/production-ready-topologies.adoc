@@ -94,7 +94,7 @@ spec:
       transaction.state.log.min.isr: 2
     storage:
       type: persistent-claim
-      size: 20Gi
+      size: 3Gi
       deleteClaim: false
   zookeeper:
     replicas: 3
@@ -146,7 +146,7 @@ spec:
       transaction.state.log.min.isr: 2
     storage:
       type: persistent-claim
-      size: 20Gi
+      size: 3Gi
       deleteClaim: false
   zookeeper:
     replicas: 3
