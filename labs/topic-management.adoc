@@ -104,4 +104,10 @@ Topic:lines	PartitionCount:10	ReplicationFactor:2	Configs:segment.bytes=10737418
 	Topic: lines	Partition: 9	Leader: 3	Replicas: 3,0	Isr: 3,0
 ----
 
-Now that the topic has been created, we can start running some applications. 
+We can now exit the container.
+
+----
+exit
+----
+
+Now that the topic has been created, we can start running some applications.

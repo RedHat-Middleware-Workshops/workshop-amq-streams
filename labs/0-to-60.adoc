@@ -2,16 +2,29 @@
 
 In this module you will learn how to install AMQ Streams on OpenShift.
 
-=== Installing AMQ Streams
+=== AMQ Streams installation files
 
-All the components are available at the [Downloads page](https://developers.redhat.com/products/amq/download/) of [https://developers.redhat.com/products/amq/overview/](https://developers.redhat.com/products/amq/overview/).
-Navigate to that page and download AMQ Streams.
-
-The zip file has been downloaded and extracted in your local directory.
+All the components necessary for installing AMQ Streams have been downloaded and extracted locally.
+Once you log into the workstation machine, you should find a directory named `kafka`.
+Let's navigate to the folder.
 
 ----
 cd kafka
 ----
+
+This directory contains three items:
+
+* the unextracted zip file named `install_and_examples.zip`
+* the contents of the zip file, as two folders: `install` and `examples`
+
+[NOTE]
+.Where does the zip file come from?
+The installation files for AMQ Streams can be downloaded from link:https://access.redhat.com/node/3596931/423/1[this location].
+You can find this information in the reference documentation https://access.redhat.com/documentation/en-us/red_hat_amq/7.2/html-single/using_amq_streams_on_openshift_container_platform/index#downloads-str[here].
+The machines provisioned for the lab have downloaded and extracted this fine already.
+
+Verify that this is the case by listing the contents of the directory.
+Now we can start the lab.
 
 === Creating a new project for running the cluster operator
 
@@ -19,14 +32,14 @@ Log in as the administrator with the password supplied by the instructor.
 
     oc login -u admin master00.example.com
 
-You should already be in the `amq-streams` project.
+A project named `amq-streams` should already exist and should be current for your user.
 If it does not exist, you can create it.
 
     oc new-project amq-streams
 
 === Configuring the cluster operator and installing it
 
-The configuration files for the cluster operator are available in the `$AMQSTREAMS_HOME/install/cluster-operator` folder.
+The configuration files for the cluster operator are available in the `install/cluster-operator` folder.
 Let's take a quick look.
 
 ----
@@ -184,10 +197,19 @@ $ oc rsh simple-cluster-kafka-0
 ----
 
 And let's start a consumer:
-$ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning
+
+----
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning
+----
 
 Once the consumer is started, you should see the previously sent messages in the output.
 Reverting to the terminal where we started the console producer and sending any new messages there will result in those messages being displayed in the consumer terminal.
+
+Now let's exit from the terminal of both containers.
+
+----
+exit
+----
 
 Finally, let's delete the Kafka cluster.
 We will replace it with a configuration that is more appropriate for real world use cases.

@@ -2,6 +2,8 @@
 
 This is the lab section of the AMQ Streams workshop.
 
+Before starting, let's get familiar with the link:./environment.adoc[lab environment].
+
 # Outline
 
 . link:./0-to-60.adoc[AMQ Streams on OpenShift from 0 to 60]
@@ -14,12 +16,12 @@ This is the lab section of the AMQ Streams workshop.
 
 . link:./clients-within-outside-OCP.adoc[Clients: within OCP and outside OCP]
 
-. link:./management-monitoring.adoc[Management, monitoring and troubleshooting]
-
 . link:./security.adoc[Security]
-
-. link:./kafka-connect.adoc[Running KafkaConnect applications]
 
 . link:./watching-multiple-namespaces.adoc[Watching multiple namespaces]
 
 . link:./mirror-maker.adoc[Replicating Data with MirrorMaker]
+
+. link:./kafka-connect.adoc[Running KafkaConnect applications]
+
+. link:./management-monitoring.adoc[Management and monitoring]
