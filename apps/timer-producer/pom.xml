@@ -11,7 +11,7 @@
     <groupId>com.redhat.workshop.amqstreams</groupId>
     <artifactId>time-producer</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>http-producer</name>
+    <name>time-producer</name>
     <description>Demo project for Spring Boot</description>
 
 

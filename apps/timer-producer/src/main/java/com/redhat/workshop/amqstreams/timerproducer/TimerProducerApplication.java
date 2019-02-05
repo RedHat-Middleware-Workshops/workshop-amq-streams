@@ -1,6 +1,5 @@
 package com.redhat.workshop.amqstreams.timerproducer;
 
-import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,7 +16,8 @@ public class TimerProducerApplication {
 
 
                 from("timer:hello?period={{timer.period}}")
-                        .transform(header(Exchange.TIMER_FIRED_TIME).convertToString())
+                        .transform().simple("Message ${in.header.CamelTimerCounter} at ${in.header.CamelTimerFiredTime}")
+                        .log("Sent ${in.body}")
                         .inOnly("kafka:{{output.topic}}");
 
 
