@@ -64,9 +64,10 @@ Create the prometheus datasource.
 Go to the `Gear' icon on the left and then pick *Datasources*.
 
 Fill following values:
-  name: prometheus
-  type: prometheus
-  url:  `http://prometheus-amq-streams.apps-<GUID>.generic.opentlc.com`
+
+     name: prometheus
+     type: prometheus
+     url:  `http://prometheus-amq-streams.apps-<GUID>.generic.opentlc.com`
 
 Save and Test.
 You should see a 'data source tested' message.
