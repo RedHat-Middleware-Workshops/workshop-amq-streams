@@ -18,3 +18,5 @@ spec:
           env:
             - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_BROKERS
               value: "production-ready-kafka-bootstrap.amq-streams.svc:9092"
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_GROUP_ID
+              value: test-group

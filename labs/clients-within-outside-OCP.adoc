@@ -74,7 +74,7 @@ wget -O log-consumer.jar https://github.com/mbogoevici/workshop-amq-streams/blob
 wget -O timer-producer.jar https://github.com/mbogoevici/workshop-amq-streams/blob/master/bin/timer-producer.jar?raw=true
 ----
 
-Let's launch the two applications with new configuration settings (replace GUID with your workstation GUID):
+Let's launch the two applications with new configuration settings (replace GUID with your workstation G):
 
 ----
 java -jar log-consumer.jar \

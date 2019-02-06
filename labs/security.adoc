@@ -97,9 +97,9 @@ Let's apply this new configuration.
 oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/users/secure-topic-reader.yaml
 ----
 
-The newly created user can read the metadata of topic `test-topic` and consume (read) from it with the consumer group `test-group`.
+The newly created user can read the metadata of topic `lines` and consume (read) from it with the consumer group `lines`.
 
-But now we need a user that can produce data to `test-topic`!
+But now we need a user that can produce data to `lines`!
 Let's create a new resource:
 
 ----

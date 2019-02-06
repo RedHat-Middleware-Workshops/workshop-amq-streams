@@ -105,3 +105,10 @@ We expect the output to look like as follows:
 ----
 
 Messages should continue to arrive every five seconds, and this indicates that the two applications communicate with each other.
+
+Now let's delete the two applications.
+
+----
+oc delete deployment log-consumer
+oc delete deployment timer-producer
+----
