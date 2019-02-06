@@ -10,16 +10,16 @@ spec:
   authorization:
     type: simple
     acls:
-      # Example consumer Acls for topic secure-topic using consumer group secure-group
+      # Example consumer Acls for topic lines using consumer group secure-group
       - resource:
           type: topic
-          name: secure-topic
+          name: lines
           patternType: literal
         operation: Read
         host: "*"
       - resource:
           type: topic
-          name: secure-topic
+          name: lines
           patternType: literal
         operation: Describe
         host: "*"

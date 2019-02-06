@@ -13,7 +13,7 @@ spec:
       # Example Producer Acls for topic secure-topic
       - resource:
           type: topic
-          name: secure-topic
+          name: lines
           patternType: literal
         operation: Write
         host: "*"
