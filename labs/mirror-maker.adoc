@@ -51,7 +51,7 @@ oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-strea
 ----
 
 The notions of producer and consumer are from MirrorMaker's perspective.
-Messages will be read from the producer (in MirrorMaker config) and published to consumer.
+Messages will be read by the consumer (in MirrorMaker config) from the source cluster and published by the publisher (in MirrorMaker config) to the target cluster.
 
 
 Go to the Openshift web console.
