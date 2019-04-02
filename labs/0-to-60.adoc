@@ -127,7 +127,7 @@ You have just deployed the cluster operator.
 
 It is time to start an Apache Kafka cluster.
 We will create now the most basic cluster possible.
-The configuration file is https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/simple-cluster.yaml[here].
+The configuration file is https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/simple-cluster.yaml[here].
 You can open it - it looks like this:
 
 ----
@@ -158,7 +158,7 @@ spec:
 
 Now let's create the cluster by deploying this new custom resource:
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/simple-cluster.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/simple-cluster.yaml
 ----
 
 Again, follow the deployment from the OpenShift console.

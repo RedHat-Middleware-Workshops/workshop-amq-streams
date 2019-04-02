@@ -21,8 +21,8 @@ oc project amq-streams
 ----
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/timer-producer-team-1.yaml
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer-team-2.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/timer-producer-team-1.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/log-consumer-team-2.yaml
 ----
 
 Now the `log-consumer` application consumes data from cluster `test-2`, while `timer-producer` sends data to cluster `test-1`.
@@ -30,7 +30,7 @@ If we look at `log-consumer`s output, we will see that no data is received.
 
 We can confirm that pointing the application to the cluster `test-1` will yield data.
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer-team-1.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/log-consumer-team-1.yaml
 ----
 
 === Setting up the source and target clusters
@@ -47,7 +47,7 @@ oc project amq-streams
 Now let's deploy MirrorMaker.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/mirror-maker.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/mirror-maker.yaml
 ----
 
 The notions of producer and consumer are from MirrorMaker's perspective.
@@ -68,7 +68,7 @@ This will confirm that the replicated topic `lines` was created automatically.
 Now let's deploy `log-consumer` against the cluster in `test-2`:
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer-team-2.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/log-consumer-team-2.yaml
 ----
 
 Logging the pod again should yield the expected results and data flows between systems.

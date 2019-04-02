@@ -15,7 +15,7 @@ In this case it is 'amq-streams'.
 We will reconfigure the `production-ready` cluster to advertise metrics.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready-monitored.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready-monitored.yaml
 ----
 
 === Installing Prometheus
@@ -23,7 +23,7 @@ oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/ma
 To install Prometheus, we use the instructions of the Strimzi labs: https://strimzi.io/docs/0.9.0/#kafka_metrics_configuration
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/metrics/prometheus.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/metrics/prometheus.yaml
 ----
 
 Then we create a route for the Prometheus service.
@@ -36,7 +36,7 @@ oc expose svc prometheus
 === Install Grafana
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/metrics/grafana.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/metrics/grafana.yaml
 ----
 
 Then we create a route for the Grafana service.
