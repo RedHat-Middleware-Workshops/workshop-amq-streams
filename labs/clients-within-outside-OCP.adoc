@@ -45,7 +45,7 @@ spec:
 Now let's apply this configuration to the running cluster.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready-external-routes.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready-external-routes.yaml
 ----
 
 Now you can inspect the existing services.
@@ -70,8 +70,8 @@ We can now run our producer and consumer applications by using this certificate.
 Let's download the two JARs.
 
 ----
-wget -O log-consumer.jar https://github.com/mbogoevici/workshop-amq-streams/blob/master/bin/log-consumer.jar?raw=true
-wget -O timer-producer.jar https://github.com/mbogoevici/workshop-amq-streams/blob/master/bin/timer-producer.jar?raw=true
+wget -O log-consumer.jar https://github.com/RedHatWorkshops/workshop-amq-streams/blob/master/bin/log-consumer.jar?raw=true
+wget -O timer-producer.jar https://github.com/RedHatWorkshops/workshop-amq-streams/blob/master/bin/timer-producer.jar?raw=true
 ----
 
 Let's launch the two applications with new configuration settings (replace <GUID> with your workstation GUID):

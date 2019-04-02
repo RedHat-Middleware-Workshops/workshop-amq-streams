@@ -110,7 +110,7 @@ spec:
 Let's deploy this new resource.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
 ----
 
 The cluster `production-ready` has the minimal settings for a highly available, persistent cluster.
@@ -163,14 +163,14 @@ Notice the only change being the number of nodes.
 Let's apply this new configuration:
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready-5-nodes.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready-5-nodes.yaml
 ----
 
 Notice the number of pods of the Kafka cluster increasing to 5 and the corresponding persistent claims.
 Now let's scale down the cluster again.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
 ----
 
 Notice the number of pods of the Kafka cluster decreasing back to 3.
@@ -179,7 +179,7 @@ What does this mean?
 Let's scale up the cluster again.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready-5-nodes.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready-5-nodes.yaml
 ----
 
 Notice the number of pods increasing back to 5 and the corresponding persistent volume claims being reallocated to the existing nodes.
@@ -188,5 +188,5 @@ This means that the newly started instances will resume from where the previous 
 Three broker nodes will be sufficient for our lab, so we can scale things down again:
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
 ----

@@ -34,7 +34,7 @@ Notice a few important attributes:
 Now let's deploy the `KafkaTopic` into our current project:
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/topics/lines.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/topics/lines.yaml
 ----
 
 Let's wait a number of seconds and let's try to check that the topic has been created and log into one of the Kafka pods.
@@ -80,7 +80,7 @@ spec:
 
 Next, we will apply the new configuration.
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/topics/lines-10.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/topics/lines-10.yaml
 ----
 
 And let's get the topic information again.

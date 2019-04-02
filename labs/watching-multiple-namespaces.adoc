@@ -143,7 +143,7 @@ Use the console to monitor the result.
 
 Let's deploy
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml -n team-1
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready.yaml -n team-1
 ----
 
 From the OpenShift console, navigate to the `team-1` project and notice the new cluster, as well as service.
@@ -153,8 +153,8 @@ Let's see that the cluster works.
 Reconfigure the `timer-producer` and `log-consumer` applications to use the new cluster.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer-team-1.yaml
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/timer-producer-team-1.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/log-consumer-team-1.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/timer-producer-team-1.yaml
 ----
 
 Once the applications have restarted, navigate to the logs and you should see the messages flowing again.
@@ -214,7 +214,7 @@ oc login -u dev-team-2 master00.example.com
 Change the cluster configuration:
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
 ----
 
 You should see the operation failing with an error along the lines of `Error from server (Forbidden):`.
@@ -225,7 +225,7 @@ Log in as `admin` and apply the roles.
 
 ----
 oc login -u admin master00.example.com
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/users/strimzi-admin.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/users/strimzi-admin.yaml
 ----
 
 Assign the cluster role to the newly created users.
@@ -238,7 +238,7 @@ Now log in again try to repeat the operation.
 
 ----
 oc login -u dev-team-2 master00.example.com
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
 ----
 
 You should see the new cluster being created.

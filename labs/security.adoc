@@ -44,7 +44,7 @@ EOF
 Let's deploy the new configuration:
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready-secured.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready-secured.yaml
 ----
 
 Watch for the changes in the stateful set.
@@ -94,7 +94,7 @@ spec:
 Let's apply this new configuration.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/users/secure-topic-reader.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/users/secure-topic-reader.yaml
 ----
 
 The newly created user can read the metadata of topic `lines` and consume (read) from it with the consumer group `lines`.
@@ -126,7 +126,7 @@ spec:
 
 And let's apply this new configuration.
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/users/secure-topic-writer.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/users/secure-topic-writer.yaml
 ----
 
 Go to `Secrets` and observe that new secret named `secure-topic-reader` and `secure-topic-writer` have been created.
@@ -135,8 +135,8 @@ Both secrets have a field named `password`.
 Now let's redeploy our running applications.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/timer-producer.yaml
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/timer-producer.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/log-consumer.yaml
 ----
 
 Looking at the logs, we see a lot of errors - the clients cannot connect anymore.
@@ -181,7 +181,7 @@ spec:
 Now let's deploy this new configuration.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/timer-producer-secured.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/timer-producer-secured.yaml
 ----
 
 We need to secure the `log-consumer` application as well:
@@ -227,7 +227,7 @@ spec:
 Let's apply this new configuration:
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer-secured.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/log-consumer-secured.yaml
 ----
 
 Inspect the log of `log-consumer` again.

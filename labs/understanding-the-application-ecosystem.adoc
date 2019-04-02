@@ -36,7 +36,7 @@ spec:
 Next, we deploy the application.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/timer-producer.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/timer-producer.yaml
 ----
 
 
@@ -71,7 +71,7 @@ spec:
 Now, let's deploy the message consumer.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/log-consumer.yaml
 ----
 
 Make sure that everything works and all the applications are started, then we will validate that the applications communicate with each other.
