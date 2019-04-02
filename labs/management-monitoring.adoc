@@ -20,7 +20,7 @@ oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/ma
 
 === Installing Prometheus
 
-To install Prometheus, we use the instructions of the Strimzi labs: https://strimzi.io/docs/0.9.0/#kafka_metrics_configuration
+To install Prometheus, we use the instructions of the Strimzi labs: https://strimzi.io/docs/0.11.1/#kafka_metrics_configuration
 
 ----
 oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/metrics/prometheus.yaml
@@ -74,12 +74,12 @@ You should see a 'data source tested' message.
 
 Import Dashboard definitions.
 Go to the + on the top left and choose "import".
-Copy the JSON from this location `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.9.0/metrics/examples/grafana/strimzi-kafka.json`
+Copy the JSON from this location `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.11.1/metrics/examples/grafana/strimzi-kafka.json`
 Pick prometheus as the datasource and finish
 You should see the dashboard with data like in the screenshots.
 
 Similarly to create kafka-zookeeper dashboards, import the corresponding definition.
 Go to the + on the top left and choose "import".
-Copy the JSON from this location `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.9.0/metrics/examples/grafana/strimzi-zookeeper.json`
+Copy the JSON from this location `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.11.1/metrics/examples/grafana/strimzi-zookeeper.json`
 Pick prometheus as the datasource and finish.
 You should see the dashboard with data like in the screenshots.
