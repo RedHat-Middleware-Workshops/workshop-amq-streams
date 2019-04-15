@@ -50,7 +50,7 @@ spec:
 Let's take a look at a few of the cluster properties.
 The cluster has:
 
-* a name: `metadata.name: my-cluster`
+* a name: `metadata.name: simple-cluster`
 * a number of kafka replicas: `spec.kafka.replicas: 1`
 * storage configuration for the Kafka cluster: `spec.kafka.storage: ephemeral`
 * configurations for listeners and configuration parameters for the brokers (e.g. replication settings)
