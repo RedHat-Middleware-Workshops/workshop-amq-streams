@@ -37,6 +37,10 @@ If it does not exist, you can create it.
 
     oc new-project amq-streams
 
+If it does already exist, be sure that it is the current project working on.
+
+    oc project amq-streams
+
 === Configuring the cluster operator and installing it
 
 The configuration files for the cluster operator are available in the `install/cluster-operator` folder.
