@@ -48,6 +48,7 @@ Now let's apply this configuration to the running cluster.
 oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready-external-routes.yaml
 ----
 
+You can see that the Cluster Operator is starting a rolling update on the Kafka cluster, restarting each broker one by one for updating their configuration in order to expose the cluster outside of OpenShift.
 Now you can inspect the existing services.
 Notice that each of the brokers in the cluster has a route and a new bootstrap service has been created for external connections.
 
