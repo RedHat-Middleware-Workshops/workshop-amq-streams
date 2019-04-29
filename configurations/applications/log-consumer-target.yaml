@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: log-consumer
+  labels:
+    app: kafka-workshop
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-workshop
+        name: log-consumer
+    spec:
+      containers:
+        - name: log-consumer
+          image: docker.io/mbogoevici/log-consumer:latest
+          env:
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_BROKERS
+              value: "production-ready-target-kafka-bootstrap.amq-streams.svc:9092"
+            - name: CAMEL_COMPONENT_KAFKA_CONFIGURATION_GROUP_ID
+              value: test-group

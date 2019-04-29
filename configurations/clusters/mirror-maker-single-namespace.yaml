@@ -1,0 +1,13 @@
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaMirrorMaker
+metadata:
+  name: mirror-maker
+spec:
+  image: strimzi/kafka-mirror-maker:latest
+  replicas: 1
+  consumer:
+    bootstrapServers: production-ready-kafka-bootstrap.amq-streams.svc:9092
+    groupId: mirror-maker-group-id
+  producer:
+    bootstrapServers: production-ready-target-kafka-bootstrap.amq-streams.svc:9092
+  whitelist: "lines|test-topic"
