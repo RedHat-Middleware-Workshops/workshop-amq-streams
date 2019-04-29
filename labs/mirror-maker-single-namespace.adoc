@@ -23,7 +23,7 @@ We will use the cluster previously created in this workshop as source but withou
 In order to do that, let's update the already running `production-ready` cluster actually removing the authentication.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
 ----
 
 We will use this cluster as source of the mirroring, having the `timer-producer` application sending messages to the `lines` topic.
@@ -31,7 +31,7 @@ We will use this cluster as source of the mirroring, having the `timer-producer`
 Let's deploy another `production-ready-target` cluster as target of the mirroring from where the `log-consumer` application will read messages.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/production-ready-target.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready-target.yaml
 ----
 
 Wait for the new cluster to be deployed.
@@ -39,13 +39,13 @@ Wait for the new cluster to be deployed.
 Now, because the `timer-producer` application will write on the already existing `lines` topic on `production-ready` cluster, let's create a corresponding `lines` topic on the `production-ready-target` cluster as destination of the mirroring, from where the `log-consumer` application will read messages.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/topics/lines-10-target.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/topics/lines-10-target.yaml
 ----
 
 Now let's deploy MirrorMaker.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/clusters/mirror-maker-single-namespace.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/mirror-maker-single-namespace.yaml
 ----
 
 The notions of producer and consumer are from MirrorMaker's perspective.
@@ -54,13 +54,13 @@ Messages will be read from the producer (in MirrorMaker config) and published to
 Now let's deploy the `log-consumer` application reading from the target cluster.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/log-consumer-target.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/log-consumer-target.yaml
 ----
 
 And finally the `timer-producer` application writing to the source cluster.
 
 ----
-oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/master/configurations/applications/timer-producer.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/timer-producer.yaml
 ----
 
 Logging the related pods should yield the expected results and data flows between systems.
