@@ -49,7 +49,7 @@ oc apply -f https://raw.githubusercontent.com/mbogoevici/workshop-amq-streams/ma
 
 Watch for the changes in the stateful set.
 Once all pods have been restarted, you can proceed.
-The `plain` listener is now configured to use the `SCRAM` challenge mechanism for connecting clients.
+The `plain` listener is now configured to use the `SCRAM-SHA-512` challenge mechanism for connecting clients.
 
 === Creating users and ACLs
 
