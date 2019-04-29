@@ -22,6 +22,6 @@ Before starting, let's get familiar with the link:../labs/environment.adoc[lab e
 
 ## Module 3
 
-. link:../labs/mirror-maker.adoc[Replicating Data with MirrorMaker]
+. link:../labs/mirror-maker-single-namespace.adoc[Replicating Data with MirrorMaker]
 
 . link:../labs/management-monitoring.adoc[Management and monitoring]
