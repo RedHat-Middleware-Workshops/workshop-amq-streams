@@ -2,7 +2,7 @@
 
 These are the modules and related labs of the "Running Apache Kafka on OpenShift with AMQ streams" workshop at the Red Hat Summit 2019.
 
-Before starting, let's get familiar with the link:../labs/environment.adoc[lab environment].
+Before starting, let's get familiar with the link:./environment.adoc[lab environment].
 
 # Outline
 
