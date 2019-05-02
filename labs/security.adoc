@@ -97,7 +97,7 @@ Let's apply this new configuration.
 oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/users/secure-topic-reader.yaml
 ----
 
-The newly created user can read the metadata of topic `lines` and consume (read) from it with the consumer group `lines`.
+The newly created user can read the metadata of topic `lines` and consume (read) from it with the consumer group `secure-group`.
 
 But now we need a user that can produce data to `lines`!
 Let's create a new resource:
@@ -132,7 +132,7 @@ oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-strea
 Go to `Secrets` and observe that new secret named `secure-topic-reader` and `secure-topic-writer` have been created.
 Both secrets have a field named `password`.
 
-Now let's redeploy our running applications.
+Now let's redeploy our running applications by running on the OpenShift cluster.
 
 ----
 oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/timer-producer.yaml
