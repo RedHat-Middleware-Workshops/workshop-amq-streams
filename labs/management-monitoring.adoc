@@ -6,7 +6,7 @@ This lab will be focus on:
 - Importing prebuilt Grafana dashboard definitions for kafka and zookeeper.
 
 While OpenShift uses Grafana and Prometheus internally, we need to use separate Prometheus and Grafana instances for our applications.
-For this exercise, we will install our own instance of Prometheus and Grafana for Kafka monitoring in the same namespace as the Kafak cluster.
+For this exercise, we will install our own instance of Prometheus and Grafana for Kafka monitoring in the same namespace as the Kafka cluster.
 In this case it is 'amq-streams'.
 
 
@@ -53,7 +53,7 @@ Get the route:
 oc get routes
 ----
 
-It should be similar to : http://grafana-amq-streams.apps-<GUID>.generic.opentlc.com
+It should be similar to : "http://grafana-amq-streams.apps-<GUID>.generic.opentlc.com"
 
 Login as `admin`/`admin` to the Grafana dashboard on your browser with the URL from above.
 You can also change the admin password if you'd like.
@@ -63,10 +63,9 @@ You can also change the admin password if you'd like.
 Create the prometheus datasource.
 Go to the `Gear' icon on the left and then pick *Datasources*.
 
-Fill following values:
+Choose Prometheus as data source type and then fill following values:
 
      name: prometheus
-     type: prometheus
      url:  `http://prometheus-amq-streams.apps-<GUID>.generic.opentlc.com`
 
 Save and Test.
