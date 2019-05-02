@@ -109,7 +109,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ----
 
-Notice the `amq-streams` value configured for `subjects[namespace]`.
+Notice the `amq-streams` value configured for the `subjects.namespace` property.
 You can check the other `*RoleBinding*.yaml` files for similar changes.
 
 Now that the configuration files have been set, we can proceed with installing the cluster operator.
@@ -119,7 +119,7 @@ Now that the configuration files have been set, we can proceed with installing t
 Once the configuration files are changed, you can install the cluster operator:
 
 ----
-oc apply -f install/cluster-operator -n amq-streams
+oc apply -f install/cluster-operator
 ----
 
 For visualizing the result, log into the OpenShift console with the `admin` user.
@@ -221,7 +221,7 @@ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-top
 Once the consumer is started, you should see the previously sent messages in the output.
 Reverting to the terminal where we started the console producer and sending any new messages there will result in those messages being displayed in the consumer terminal.
 
-Now let's exit from the terminal of both containers.
+Now let's stop both producer and consumer applications with `CTRL-C` and then exit from the terminal of both containers.
 
 ----
 exit
