@@ -52,6 +52,10 @@ You can see that the Cluster Operator is starting a rolling update on the Kafka 
 Now you can inspect the existing services.
 Notice that each of the brokers in the cluster has a route and a new bootstrap service has been created for external connections.
 
+----
+oc get routes
+----
+
 === Connecting external clients
 
 For interacting with the broker, external clients must use TLS.
