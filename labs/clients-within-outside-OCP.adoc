@@ -96,3 +96,5 @@ java -jar timer-producer.jar \
       --camel.component.kafka.configuration.ssl-truststore-location=keystore.jks \
       --camel.component.kafka.configuration.ssl-truststore-password=password --server.port=0
 ----
+
+After observing how the two clients are exchaning messages from outside the OpenShift cluster, exit both the applications via `CTRL-C`.
