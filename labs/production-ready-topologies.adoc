@@ -13,7 +13,7 @@ Configuring your Kafka cluster depends on a number of factors, and in particular
 * Making sure that your Zookeeper ensemble has at least 3 nodes
 * Making sure that the data of your Kafka cluster is persistent
 
-Our ephemeral cluster created in the previous module meets some but not all of these criteria: it has the minimum number of nodes for both Kafka and Zookeeper, but it not persistent.
+Our ephemeral cluster created in the previous module meets some but not all of these criteria: it has the minimum number of nodes for both Kafka and Zookeeper, but it is not persistent.
 Plus, we really had no control over sizing - we just used a default!
 
 === Configuring the size of your Kafka cluster deployments
@@ -50,7 +50,7 @@ spec:
 Let's take a look at a few of the cluster properties.
 The cluster has:
 
-* a name: `metadata.name: my-cluster`
+* a name: `metadata.name: simple-cluster`
 * a number of kafka replicas: `spec.kafka.replicas: 1`
 * storage configuration for the Kafka cluster: `spec.kafka.storage: ephemeral`
 * configurations for listeners and configuration parameters for the brokers (e.g. replication settings)
