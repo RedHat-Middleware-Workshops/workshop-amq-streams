@@ -1,12 +1,13 @@
 == Management and monitoring
 
-This lab will be focus on:
-- Instrumenting a cluster to support metrics
-- Deploying Prometheus and Grafana
-- Importing prebuilt Grafana dashboard definitions for kafka and zookeeper.
+This lab will be focused on:
+
+* Instrumenting a cluster to support metrics
+* Deploying Prometheus and Grafana
+* Importing prebuilt Grafana dashboard definitions for Kafka and ZooKeeper.
 
 While OpenShift uses Grafana and Prometheus internally, we need to use separate Prometheus and Grafana instances for our applications.
-For this exercise, we will install our own instance of Prometheus and Grafana for Kafka monitoring in the same namespace as the Kafak cluster.
+For this exercise, we will install our own instance of Prometheus and Grafana for Kafka monitoring in the same namespace as the Kafka cluster.
 In this case it is 'amq-streams'.
 
 
@@ -60,7 +61,7 @@ You can also change the admin password if you'd like.
 
 === Setting up Grafana to monitor Kafka
 
-Create the prometheus datasource.
+Create the Prometheus datasource.
 Go to the `Gear' icon on the left and then pick *Datasources*.
 
 Fill following values:
