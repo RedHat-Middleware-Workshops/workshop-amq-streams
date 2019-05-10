@@ -4,6 +4,8 @@ These are the modules and related labs of the "Running Apache Kafka on OpenShift
 
 Before starting, let's get familiar with the link:./environment.adoc[lab environment].
 
+The introductory slide deck is available link:https://speakerdeck.com/mbogoevici/running-apache-kafka-on-red-hat-openshift-with-amq-streams[here].
+
 # Outline
 
 ## Module 1
