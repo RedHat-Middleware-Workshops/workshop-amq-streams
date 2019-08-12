@@ -25,17 +25,17 @@ oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-strea
 oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/log-consumer-team-2.yaml
 ----
 
-Now the `log-consumer` application consumes data from cluster `test-2`, while `timer-producer` sends data to cluster `test-1`.
+Now the `log-consumer` application consumes data from cluster `team-2`, while `timer-producer` sends data to cluster `team-1`.
 If we look at `log-consumer`s output, we will see that no data is received.
 
-We can confirm that pointing the application to the cluster `test-1` will yield data.
+We can confirm that pointing the application to the cluster `team-1` will yield data.
 ----
 oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/log-consumer-team-1.yaml
 ----
 
 === Setting up the source and target clusters
 
-We will use the clusters previously created in this workshop in the `test-1` and `test-2` namespaces as source and target clusters.
+We will use the clusters previously created in this workshop in the `team-1` and `team-2` namespaces as source and target clusters.
 
 Make sure that you're still logged in as `admin`.
 
@@ -55,7 +55,7 @@ Messages will be read by the consumer (in MirrorMaker config) from the source cl
 
 
 Go to the Openshift web console.
-Select the `test-2` project.
+Select the `team-2` project.
 Navigate to *Applications*->*Pods* and pick production-ready-kafka-0.
 Run the following command.
 
@@ -65,7 +65,7 @@ Run the following command.
 
 This will confirm that the replicated topic `lines` was created automatically.
 
-Now let's deploy `log-consumer` against the cluster in `test-2`:
+Now let's deploy `log-consumer` against the cluster in `team-2`:
 
 ----
 oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/log-consumer-team-2.yaml
