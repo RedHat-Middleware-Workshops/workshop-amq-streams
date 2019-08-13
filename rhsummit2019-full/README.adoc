@@ -19,7 +19,7 @@ Before starting, let's get familiar with the link:./environment.adoc[lab environ
 
 . link:../labs/security.adoc[Security]
 
-. link:../labs/watching-multiple-namespaces-short.adoc[Watching multiple namespaces]
+. link:../labs/watching-multiple-namespaces-short-1.1.adoc[Watching multiple namespaces]
 
 . link:../labs/mirror-maker.adoc[Replicating Data with MirrorMaker]
 
