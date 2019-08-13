@@ -1,0 +1,244 @@
+== Separating namespace: watching multiple namespaces and delegating administration roles
+
+In the examples we've seen so far, the cluster operator as well as the Kafka cluster, topic and user CRDs were deployed in the same project/namespace.
+AMQ Streams allows the cluster operator to monitor a set of separate namespaces, which could be useful for teams that want to manage their own individual clusters.
+Each namespace is independent of the other, and resources created in each of them will result in the creation of clusters, topics and users in that specific namespace.
+
+AMQ Streams also allows regular users to take AMQ Streams administration roles, removing the need for cluster administrator permissions for day to day operations.
+
+=== Creating the namespaces
+
+Let's set up two separate projects: `team-1` and `team-2`.
+
+Execute the following commands:
+
+----
+oc new-project team-1
+----
+
+and
+
+----
+oc new-project team-2
+----
+
+For this lab, we will still deploy the cluster operator in the `amq-streams` project.
+If you've already done so, we will reconfigure it.
+So let's revert to the original project `amq-streams`.
+
+----
+oc project amq-streams
+----
+
+=== Configuring the cluster operator to watch multiple namespaces
+
+First, update the configuration files to reference the target namespace of the cluster operator.
+If you've already done so in the first lab, skip this step.
+
+----
+sed -i 's/namespace: .*/namespace: amq-streams/' install/cluster-operator/*RoleBinding*.yaml
+----
+
+Next, alter the file `install/cluster-operator/050-Deployment-strimzi-cluster-operator.yaml` to point to the monitored projects.
+
+----
+cat > install/cluster-operator/050-Deployment-strimzi-cluster-operator.yaml <<'EOF'
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: strimzi-cluster-operator
+  labels:
+    app: strimzi
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: strimzi-cluster-operator
+    spec:
+      serviceAccountName: strimzi-cluster-operator
+      containers:
+      - name: strimzi-cluster-operator
+        image: registry.access.redhat.com/amqstreams-1/amqstreams10-clusteroperator-openshift:1.0.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: STRIMZI_NAMESPACE
+          value: amq-streams,team-1,team-2
+        - name: STRIMZI_FULL_RECONCILIATION_INTERVAL_MS
+          value: "120000"
+        - name: STRIMZI_OPERATION_TIMEOUT_MS
+          value: "300000"
+        - name: STRIMZI_DEFAULT_ZOOKEEPER_IMAGE
+          value: registry.access.redhat.com/amqstreams-1/amqstreams10-zookeeper-openshift:1.0.0
+        - name: STRIMZI_DEFAULT_KAFKA_IMAGE
+          value: registry.access.redhat.com/amqstreams-1/amqstreams10-kafka-openshift:1.0.0
+        - name: STRIMZI_DEFAULT_KAFKA_CONNECT_IMAGE
+          value: registry.access.redhat.com/amqstreams-1/amqstreams10-kafkaconnect-openshift:1.0.0
+        - name: STRIMZI_DEFAULT_KAFKA_CONNECT_S2I_IMAGE
+          value: registry.access.redhat.com/amqstreams-1/amqstreams10-kafkaconnects2i-openshift:1.0.0
+        - name: STRIMZI_DEFAULT_TOPIC_OPERATOR_IMAGE
+          value: registry.access.redhat.com/amqstreams-1/amqstreams10-topicoperator-openshift:1.0.0
+        - name: STRIMZI_DEFAULT_USER_OPERATOR_IMAGE
+          value: registry.access.redhat.com/amqstreams-1/amqstreams10-useroperator-openshift:1.0.0
+        - name: STRIMZI_DEFAULT_KAFKA_INIT_IMAGE
+          value: registry.access.redhat.com/amqstreams-1/amqstreams10-kafkainit-openshift:1.0.0
+        - name: STRIMZI_DEFAULT_TLS_SIDECAR_ZOOKEEPER_IMAGE
+          value: registry.access.redhat.com/amqstreams-1/amqstreams10-zookeeperstunnel-openshift:1.0.0
+        - name: STRIMZI_DEFAULT_TLS_SIDECAR_KAFKA_IMAGE
+          value: registry.access.redhat.com/amqstreams-1/amqstreams10-kafkastunnel-openshift:1.0.0
+        - name: STRIMZI_DEFAULT_TLS_SIDECAR_ENTITY_OPERATOR_IMAGE
+          value: registry.access.redhat.com/amqstreams-1/amqstreams10-entityoperatorstunnel-openshift:1.0.0
+        - name: STRIMZI_DEFAULT_KAFKA_MIRRORMAKER_IMAGE
+          value: registry.access.redhat.com/amqstreams-1/amqstreams10-kafkamirrormaker-openshift:1.0.0
+        - name: STRIMZI_LOG_LEVEL
+          value: INFO
+        livenessProbe:
+          httpGet:
+            path: /healthy
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 256Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+  strategy:
+    type: Recreate
+EOF
+----
+
+Next, install `RoleBinding`s for each of the two monitored namespaces:
+
+----
+oc apply -f install/cluster-operator/020-RoleBinding-strimzi-cluster-operator.yaml -n team-1
+oc apply -f install/cluster-operator/031-RoleBinding-strimzi-cluster-operator-entity-operator-delegation.yaml -n team-1
+oc apply -f install/cluster-operator/032-RoleBinding-strimzi-cluster-operator-topic-operator-delegation.yaml -n team-1
+----
+
+and
+
+----
+oc apply -f install/cluster-operator/020-RoleBinding-strimzi-cluster-operator.yaml -n team-2
+oc apply -f install/cluster-operator/031-RoleBinding-strimzi-cluster-operator-entity-operator-delegation.yaml -n team-2
+oc apply -f install/cluster-operator/032-RoleBinding-strimzi-cluster-operator-topic-operator-delegation.yaml -n team-2
+----
+
+Finally, install - or re-install and reconfigure the `cluster-operator`.
+
+----
+oc apply -f install/cluster-operator
+----
+
+Now we can deploy clusters, topics and users in each of these namespaces.
+Use the console to monitor the result.
+
+Let's deploy
+----
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready.yaml -n team-1
+----
+
+From the OpenShift console, navigate to the `team-1` project and notice the new cluster, as well as service.
+
+Let's see that the cluster works.
+
+Reconfigure the `timer-producer` and `log-consumer` applications to use the new cluster.
+
+----
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/log-consumer-team-1.yaml
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/applications/timer-producer-team-1.yaml
+----
+
+Once the applications have restarted, navigate to the logs and you should see the messages flowing again.
+The applications deployed in the `amq-streams` namespace will interact with a Kafka cluster configured in the `team-1` namespace.
+
+=== Strimzi Administrators
+
+So far, we have used a cluster administrator to set up and manage Kafka clusters and topics.
+AMQ Streams allows the assignment of administrative permissions to regular user for day-to-day operations, once the cluster operator has been installed.
+
+==== Creating OpenShift users
+
+OpenShift allows different strategies for creating users.
+In this lab we will create simple users authenticated against the OpenShift configuration files.
+
+First, let's create the users:
+----
+oc create user dev-team-1
+oc create user dev-team-2
+----
+
+Now we need to assign identities.
+We need to log in directly into the master machine.
+
+----
+ssh master00.example.com
+----
+
+Change user to `root`.
+----
+sudo -i
+----
+
+Now let's update the password file for the newly created users.
+Use a password that you can remember for each user.
+
+----
+htpasswd /etc/origin/master/htpasswd dev-team-1
+htpasswd /etc/origin/master/htpasswd dev-team-2
+----
+
+Assign the two users to the previously created projects:
+
+----
+oc adm policy add-role-to-user admin dev-team-1 -n team-1
+oc adm policy add-role-to-user admin dev-team-2 -n team-2
+----
+
+Exit the `root` account and the remote shell into the `master00` machine.
+
+Log into one of the users and change current project:
+
+----
+oc login -u dev-team-2 master00.example.com
+----
+
+Change the cluster configuration:
+
+----
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
+----
+
+You should see the operation failing with an error along the lines of `Error from server (Forbidden):`.
+Your user does not have permission to update the custom resources.
+
+To correct that, we will first create a `StrimziAdmin` cluster role that we can assign to users.
+Log in as `admin` and apply the roles.
+
+----
+oc login -u admin master00.example.com
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/users/strimzi-admin.yaml
+----
+
+Assign the cluster role to the newly created users.
+
+----
+oc adm policy add-cluster-role-to-user strimzi-admin dev-team-1 dev-team-2
+----
+
+Now log in again try to repeat the operation.
+
+----
+oc login -u dev-team-2 master00.example.com
+oc apply -f https://raw.githubusercontent.com/RedHatWorkshops/workshop-amq-streams/master/configurations/clusters/production-ready.yaml
+----
+
+You should see the new cluster being created.
