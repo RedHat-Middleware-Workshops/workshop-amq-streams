@@ -1,3 +1,38 @@
-# What is this?
+= Red Hat Integration: AMQ Streams Workshop
 
-This is a workshop for teaching the basics of AMQ Streams.
+=== Introduction
+
+link:https://www.redhat.com/en/topics/integration/what-is-apache-kafka[Apache Kafka] has become the leading platform for building real-time data pipelines.  Today, Kafka is heavily used for developing event-driven applications,  where it lets services communicate with each other through events. Using Kubernetes for this type of workload requires adding specialized  components such as Kubernetes Operators and connectors to bridge the  rest of your systems and applications to the Kafka ecosystem.
+
+To respond to business demands quickly and efficiently, you need a way  to integrate applications and data spread across your enterprise. link:https://www.redhat.com/en/technologies/jboss-middleware/amq[Red Hat AMQ] — based on open source communities like Apache ActiveMQ and Apache  Kafka — is a flexible messaging platform that delivers information  reliably, enabling real-time integration and connecting the Internet of  Things (IoT).
+
+image::https://access.redhat.com/webassets/avalon/d/Red_Hat_AMQ-7.7-Evaluating_AMQ_Streams_on_OpenShift-en-US/images/320e68d6e4b4080e7469bea094ec8fbf/operators.png[Operators within the AMQ Streams architecture]
+
+AMQ streams, a link:https://www.redhat.com/en/products/integration[Red Hat Integration] component, makes Apache Kafka “OpenShift native” through the use of  powerful operators that simplify the deployment, configuration,  management, and use of Apache Kafka on Red Hat OpenShift.
+
+=== Audience
+
+- Developers
+- Architects
+- Data Integrators
+
+=== Duration
+
+This workshop introduces participants to AMQ through a presentation and  hands-on lab format. This workshop is intended to be completed in a  half-day (4hrs) session.
+
+=== Agenda
+
+=== Labs
+
+The main idea of the workshop is to present to the student a set of  hands-on labs to test the features of  AMQ Streams. The following labs should cover the main aspects of the product.
+
+- link:labs/0-to-60.adoc[Lab 01] - AMQ Streams from 0 to 60
+
+=== Contributing
+
+We welcome all forms of contribution (content, issues/bugs, feedback).
+
+=== Support and ownership
+
+If you have any questions or are in need of support, reach out to [Hugo Guerrero](https://github.com/hguerrero)
+
