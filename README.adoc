@@ -34,5 +34,5 @@ We welcome all forms of contribution (content, issues/bugs, feedback).
 
 === Support and ownership
 
-If you have any questions or are in need of support, reach out to [Hugo Guerrero](https://github.com/hguerrero)
+If you have any questions or are in need of support, reach out to link:https://github.com/hguerrero[Hugo Guerrero]
 
