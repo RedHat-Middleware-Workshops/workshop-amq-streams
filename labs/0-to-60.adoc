@@ -80,8 +80,16 @@ Prior to installing the cluster operator, we will need to configure the namespac
 We will do this by modifying the `*RoleBinding*.yaml` files to point to the newly created project `amq-streams`.
 You can do this by simply editing all files via `sed`.
 
+On RHEL, run:
+
 ----
 sed -i 's/namespace: .*/namespace: amq-streams/' install/cluster-operator/*RoleBinding*.yaml
+----
+
+For MacOS, run:
+
+----
+sed -i '' 's/namespace: .*/namespace: amq-streams/' install/cluster-operator/*RoleBinding*.yaml
 ----
 
 Let's take a look at the result in one of the modified files:
